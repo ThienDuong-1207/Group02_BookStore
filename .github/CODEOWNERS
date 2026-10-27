@@ -1,0 +1,4 @@
+# Every PR automatically requests review from the code owners who are not the author.
+# TODO: add Phát's and Đan's GitHub usernames to the line below (keep the @), e.g.
+# * @ThienDuong-1207 @phat-username @dan-username
+* @ThienDuong-1207
