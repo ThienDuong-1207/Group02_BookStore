@@ -5,7 +5,7 @@ import { logoutAction } from "@/lib/auth/actions";
 const linkClass =
   "inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium hover:bg-background focus-visible:outline-2 focus-visible:outline-brand";
 
-/** Site header. Shows the user's name + Logout when logged in (US-10 M2). */
+/** Site header. Shows the user's name + Logout when logged in (US-10 M2), the Admin link only for admins (US-13 M2). */
 export async function Header() {
   const profile = await getCurrentProfile();
   const user = profile?.status === "ACTIVE" ? profile : null;
@@ -21,6 +21,11 @@ export async function Header() {
           <Link href="/books" className={linkClass}>
             Books
           </Link>
+          {user?.role === "ADMIN" && (
+            <Link href="/admin" className={linkClass}>
+              Admin
+            </Link>
+          )}
 
           {user ? (
             <>
