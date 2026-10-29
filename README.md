@@ -32,6 +32,8 @@ npm run db:types                     # regenerate src/types/database.ts
 npm run db:seed                      # ≥ 30 sample books + demo users (US-23)
 ```
 
+The seed (`scripts/seed.ts`) reads `.env.local`: it needs `SUPABASE_SERVICE_ROLE_KEY` and the `SEED_*` demo accounts (passwords: 8–64 characters with a letter and a digit). It is safe to run again: existing users, categories, authors and books are skipped. Sample data lives in `scripts/seed-data.ts` (covers from the Open Library Covers API).
+
 ## Quality checks (same as CI)
 ```bash
 npm run lint && npm run typecheck && npm test && npm run build
