@@ -1,6 +1,10 @@
 import { formatDate, type UserRow } from "@/lib/queries/users";
+import { LockToggle } from "@/components/admin/LockToggle";
 
-/** US-14 M1: the user list – cards on phones, a table from 768 px up. `meId` marks the logged-in admin. */
+/**
+ * US-14 M1: the user list – cards on phones, a table from 768 px up. `meId` marks the logged-in admin.
+ * M3 / E2: each row has a Lock / Unlock button (disabled for the admin's own account).
+ */
 export function UserList({ users, meId }: { users: UserRow[]; meId?: string }) {
   if (users.length === 0) {
     return <p className="mt-6 rounded-lg border border-dashed border-line bg-surface p-5 text-sm text-muted">No accounts yet.</p>;
@@ -21,6 +25,9 @@ export function UserList({ users, meId }: { users: UserRow[]; meId?: string }) {
               <StatusBadge status={user.status} />
               <span className="text-muted">Created {formatDate(user.created_at)}</span>
             </div>
+            <div className="mt-3 border-t border-line pt-3">
+              <LockToggle userId={user.id} email={user.email} status={user.status} isSelf={user.id === meId} />
+            </div>
           </li>
         ))}
       </ul>
@@ -35,6 +42,9 @@ export function UserList({ users, meId }: { users: UserRow[]; meId?: string }) {
               <th scope="col" className="px-4 py-3 font-medium">Role</th>
               <th scope="col" className="px-4 py-3 font-medium">Status</th>
               <th scope="col" className="px-4 py-3 font-medium">Created</th>
+              <th scope="col" className="px-4 py-3 font-medium">
+                <span className="sr-only">Actions</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -55,7 +65,7 @@ function UserTableRow({ user, isMe }: { user: UserRow; isMe: boolean }) {
         {user.full_name}
         {isMe && <YouTag />}
       </td>
-      <td className="px-4 py-3 break-all text-muted">{user.email}</td>
+      <td className="px-4 py-3 break-words text-muted">{user.email}</td>
       <td className="px-4 py-3">
         <RoleBadge role={user.role} />
       </td>
@@ -63,6 +73,9 @@ function UserTableRow({ user, isMe }: { user: UserRow; isMe: boolean }) {
         <StatusBadge status={user.status} />
       </td>
       <td className="px-4 py-3 whitespace-nowrap text-muted">{formatDate(user.created_at)}</td>
+      <td className="px-4 py-3">
+        <LockToggle userId={user.id} email={user.email} status={user.status} isSelf={isMe} />
+      </td>
     </tr>
   );
 }
