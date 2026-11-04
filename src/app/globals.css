@@ -1,18 +1,25 @@
 @import "tailwindcss";
 
-/* Design tokens. Use these (bg-surface, text-muted, border-line, bg-brand…) instead of raw colours. */
+/*
+ * Design tokens (style guide: docs/design/style-guide.md, WBS 2.3.1 / GB-107).
+ * Use these (bg-surface, text-muted, border-line, bg-brand, font-serif…) instead of raw colours.
+ * Warm "paper" background, forest-green brand, amber accent for prices and promotions.
+ */
 :root {
-  --background: #f8f7f4;
-  --foreground: #1c1b19;
+  --background: #faf7f2;
+  --foreground: #1f1a17;
   --surface: #ffffff;
-  --muted: #5f5c55;
-  --line: #e2dfd8;
-  --brand: #1f4e79;
-  --brand-hover: #173b5c;
+  --muted: #6b625a;
+  --line: #e7e0d6;
+  --brand: #1e4d3b;
+  --brand-hover: #163a2c;
   --brand-foreground: #ffffff;
+  --brand-surface: #e8f0ec;
+  --accent: #9a5b13;
+  --accent-surface: #fbf1e2;
   --danger: #b42318;
   --danger-surface: #fdecea;
-  --success: #1e6b3a;
+  --success: #2f6f3e;
   --success-surface: #e7f4ec;
 }
 
@@ -25,16 +32,31 @@
   --color-brand: var(--brand);
   --color-brand-hover: var(--brand-hover);
   --color-brand-foreground: var(--brand-foreground);
+  --color-brand-surface: var(--brand-surface);
+  --color-accent: var(--accent);
+  --color-accent-surface: var(--accent-surface);
   --color-danger: var(--danger);
   --color-danger-surface: var(--danger-surface);
   --color-success: var(--success);
   --color-success-surface: var(--success-surface);
+  /* Headings and the logo: a book-like serif that is installed on Windows, macOS and most phones (no web font download). */
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+/* In the base layer so utilities such as `font-sans` on a heading still win. */
+@layer base {
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
