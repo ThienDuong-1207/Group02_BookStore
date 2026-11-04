@@ -3,19 +3,27 @@
 import { revalidatePath } from "next/cache";
 import { AuthorizationError, requireAdmin } from "@/lib/auth/profile";
 import { MESSAGES } from "@/lib/auth/messages";
-import { ADMIN_MESSAGES, type AdminFormState } from "@/lib/admin/messages";
+import { ADMIN_MESSAGES, LOCK_BAN_DURATION, type AdminFormState } from "@/lib/admin/messages";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formDataToObject, toFieldErrors } from "@/lib/validation/auth";
-import { CREATE_USER_FIELDS, createUserSchema } from "@/lib/validation/users";
+import {
+  CREATE_USER_FIELDS,
+  SET_USER_STATUS_FIELDS,
+  createUserSchema,
+  setUserStatusSchema,
+} from "@/lib/validation/users";
 
-/** US-13 E3: every admin action starts here. Guests and non-admins get an error and nothing changes. */
-async function checkAdmin(): Promise<AdminFormState | null> {
+/**
+ * US-13 E3: every admin action starts here. Guests and non-admins get an error and nothing changes.
+ * Returns the logged-in admin's id, or the error to show.
+ */
+async function checkAdmin(): Promise<{ adminId: string; denied?: never } | { denied: AdminFormState }> {
   try {
-    await requireAdmin();
-    return null;
+    const admin = await requireAdmin();
+    return { adminId: admin.id };
   } catch (error) {
     if (error instanceof AuthorizationError) {
-      return { formError: error.status === 401 ? ADMIN_MESSAGES.notLoggedIn : ADMIN_MESSAGES.forbidden };
+      return { denied: { formError: error.status === 401 ? ADMIN_MESSAGES.notLoggedIn : ADMIN_MESSAGES.forbidden } };
     }
     throw error;
   }
@@ -23,8 +31,8 @@ async function checkAdmin(): Promise<AdminFormState | null> {
 
 /** US-14 M2, E1, B1: create an ACTIVE account with the chosen role. */
 export async function createUserAction(_prev: AdminFormState, formData: FormData): Promise<AdminFormState> {
-  const denied = await checkAdmin();
-  if (denied) return denied;
+  const check = await checkAdmin();
+  if (check.denied) return check.denied;
 
   // B1: never trust the client, validate again with the same schema as the form.
   const parsed = createUserSchema.safeParse(formDataToObject(formData, CREATE_USER_FIELDS));
@@ -62,4 +70,46 @@ export async function createUserAction(_prev: AdminFormState, formData: FormData
 
   revalidatePath("/admin/users"); // M2: the new account shows up in the list straight away
   return { success: ADMIN_MESSAGES.created(email) };
+}
+
+/**
+ * US-14 M3, E2: lock (status LOCKED + Auth ban) or unlock (status ACTIVE + ban removed) an account.
+ * Both are needed: the Auth ban stops new logins and token refreshes, the profile status is what
+ * requireAdmin(), the login check (US-10 E3) and the user list read.
+ */
+export async function setUserStatusAction(_prev: AdminFormState, formData: FormData): Promise<AdminFormState> {
+  const check = await checkAdmin();
+  if (check.denied) return check.denied;
+
+  const parsed = setUserStatusSchema.safeParse(formDataToObject(formData, SET_USER_STATUS_FIELDS));
+  if (!parsed.success) return { formError: parsed.error.issues[0].message };
+  const { userId, status } = parsed.data;
+
+  // E2: the button is disabled for the admin's own row; the server rejects it too, in case the form is bypassed.
+  if (status === "LOCKED" && userId === check.adminId) return { formError: ADMIN_MESSAGES.selfLock };
+
+  const admin = createAdminClient();
+  const { data: target, error: findError } = await admin
+    .from("profiles")
+    .select("id, email, status")
+    .eq("id", userId)
+    .maybeSingle<{ id: string; email: string; status: string }>();
+  if (findError) return { formError: MESSAGES.unexpected };
+  if (!target) return { formError: ADMIN_MESSAGES.notFound };
+
+  const banDuration = status === "LOCKED" ? LOCK_BAN_DURATION : "none";
+  const { error: banError } = await admin.auth.admin.updateUserById(userId, { ban_duration: banDuration });
+  if (banError) return { formError: MESSAGES.unexpected };
+
+  const { error: statusError } = await admin.from("profiles").update({ status }).eq("id", userId);
+  if (statusError) {
+    // Keep Auth and the profile in sync: put the ban back as it was if the status could not be saved.
+    await admin.auth.admin.updateUserById(userId, {
+      ban_duration: target.status === "LOCKED" ? LOCK_BAN_DURATION : "none",
+    });
+    return { formError: MESSAGES.unexpected };
+  }
+
+  revalidatePath("/admin/users");
+  return { success: status === "LOCKED" ? ADMIN_MESSAGES.locked(target.email) : ADMIN_MESSAGES.unlocked(target.email) };
 }

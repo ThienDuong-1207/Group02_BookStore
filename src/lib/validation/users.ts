@@ -16,3 +16,12 @@ export const createUserSchema = z.object({
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 
 export const CREATE_USER_FIELDS = ["fullName", "email", "password", "role"] as const;
+
+/** US-14 M3: lock or unlock one account. `status` is the status the account should get. */
+export const setUserStatusSchema = z.object({
+  userId: z.uuid("Unknown account"),
+  status: z.enum(["ACTIVE", "LOCKED"], "Unknown status"),
+});
+export type SetUserStatusInput = z.infer<typeof setUserStatusSchema>;
+
+export const SET_USER_STATUS_FIELDS = ["userId", "status"] as const;
