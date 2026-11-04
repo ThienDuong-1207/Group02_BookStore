@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="830" height="820" viewBox="0 0 830 820" font-family="Segoe UI, system-ui, sans-serif">
+  <title>Home page wireframe – phone 375 px, menu closed and open (US-29 + US-19, WBS 2.3.1)</title>
+  <style>
+    .frame { fill: #faf7f2; stroke: #6b625a; stroke-width: 2; }
+    .box { fill: #ffffff; stroke: #b9b0a5; stroke-width: 1.5; }
+    .fill { fill: #e7e0d6; }
+    .brand { fill: #1e4d3b; }
+    .t { fill: #1f1a17; font-size: 15px; }
+    .s { fill: #6b625a; font-size: 13px; }
+    .w { fill: #ffffff; font-size: 14px; font-weight: 600; }
+    .h { fill: #1f1a17; font-size: 22px; font-family: Palatino Linotype, Georgia, serif; font-weight: 600; }
+    .logo { fill: #1e4d3b; font-size: 20px; font-family: Palatino Linotype, Georgia, serif; font-weight: 700; }
+    .cap { fill: #1f1a17; font-size: 15px; font-weight: 700; }
+    .note { fill: #9a5b13; font-size: 12px; font-style: italic; }
+  </style>
+
+  <!-- A: menu closed -->
+  <text class="cap" x="20" y="22">A. Menu closed</text>
+  <g transform="translate(20,34)">
+    <rect class="frame" x="0" y="0" width="375" height="770" rx="18"/>
+    <rect class="box" x="0" y="0" width="375" height="60" rx="0"/>
+    <rect class="brand" x="16" y="17" width="18" height="24" rx="3"/>
+    <text class="logo" x="42" y="37">Book Store</text>
+    <rect class="box" x="315" y="8" width="44" height="44" rx="6"/>
+    <rect x="326" y="20" width="22" height="2.5" fill="#1f1a17"/>
+    <rect x="326" y="29" width="22" height="2.5" fill="#1f1a17"/>
+    <rect x="326" y="38" width="22" height="2.5" fill="#1f1a17"/>
+    <text class="note" x="210" y="76">hamburger, 44 × 44 px</text>
+
+    <text class="h" x="16" y="108">New books</text>
+    <rect class="box" x="16" y="124" width="343" height="430" rx="8"/>
+    <rect class="fill" x="32" y="140" width="311" height="290" rx="4"/>
+    <text class="s" x="150" y="290">cover 2 : 3</text>
+    <text class="t" x="32" y="458">Book title, up to two lines…</text>
+    <text class="s" x="32" y="482">Author name</text>
+    <text class="t" x="32" y="520" font-weight="600">120.000 ₫</text>
+    <rect class="box" x="16" y="570" width="343" height="60" rx="8"/>
+    <text class="s" x="140" y="606">next card…</text>
+    <text class="note" x="16" y="650">1 column at 375 px, no horizontal scroll</text>
+
+    <rect class="box" x="0" y="666" width="375" height="104"/>
+    <text class="logo" x="16" y="694" font-size="16">Book Store</text>
+    <text class="s" x="16" y="716">Explore · Project info (stacked)</text>
+    <text class="s" x="16" y="748">© 2026 Book Store · Team 02</text>
+  </g>
+
+  <!-- B: menu open -->
+  <text class="cap" x="435" y="22">B. Menu open</text>
+  <g transform="translate(435,34)">
+    <rect class="frame" x="0" y="0" width="375" height="770" rx="18"/>
+    <rect class="box" x="0" y="0" width="375" height="60"/>
+    <rect class="brand" x="16" y="17" width="18" height="24" rx="3"/>
+    <text class="logo" x="42" y="37">Book Store</text>
+    <rect class="box" x="315" y="8" width="44" height="44" rx="6"/>
+    <text class="t" x="330" y="37" font-size="22">✕</text>
+
+    <rect class="box" x="0" y="60" width="375" height="470"/>
+    <rect class="box" x="16" y="76" width="343" height="44" rx="6"/>
+    <text class="s" x="30" y="103">Search by title or author…</text>
+    <rect class="brand" x="315" y="80" width="40" height="36" rx="5"/>
+    <text class="w" x="326" y="104">🔍</text>
+    <text class="t" x="16" y="160">Books</text>
+    <line x1="16" y1="176" x2="359" y2="176" stroke="#e7e0d6"/>
+    <text class="s" x="16" y="200" font-weight="600">CATEGORIES</text>
+    <text class="t" x="16" y="230">Fiction</text>
+    <text class="t" x="16" y="262">Fantasy &amp; Science Fiction</text>
+    <text class="t" x="16" y="294">Children's Books</text>
+    <text class="s" x="16" y="324">… every visible category, 44 px rows</text>
+    <line x1="16" y1="344" x2="359" y2="344" stroke="#e7e0d6"/>
+    <text class="t" x="16" y="376">Admin  (ACTIVE admins only)</text>
+    <rect class="box" x="16" y="396" width="160" height="44" rx="6"/>
+    <text class="t" x="70" y="423">Log in</text>
+    <rect class="brand" x="190" y="396" width="169" height="44" rx="6"/>
+    <text class="w" x="244" y="423">Register</text>
+    <text class="note" x="16" y="470">logged in: "Hi, name" + Logout instead</text>
+    <text class="note" x="16" y="492">closes on ✕, Escape, link click or navigation</text>
+
+    <rect class="fill" x="0" y="530" width="375" height="240" opacity="0.5"/>
+    <text class="s" x="110" y="650">page content below</text>
+  </g>
+</svg>
