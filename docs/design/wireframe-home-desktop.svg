@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1366" height="980" viewBox="0 0 1366 980" font-family="Segoe UI, system-ui, sans-serif">
+  <title>Home page wireframe – desktop 1366 px (US-29 + US-19, WBS 2.3.1)</title>
+  <style>
+    .frame { fill: #faf7f2; stroke: #6b625a; stroke-width: 2; }
+    .box { fill: #ffffff; stroke: #b9b0a5; stroke-width: 1.5; }
+    .fill { fill: #e7e0d6; }
+    .brand { fill: #1e4d3b; }
+    .t { fill: #1f1a17; font-size: 15px; }
+    .s { fill: #6b625a; font-size: 13px; }
+    .w { fill: #ffffff; font-size: 14px; font-weight: 600; }
+    .h { fill: #1f1a17; font-size: 26px; font-family: Palatino Linotype, Georgia, serif; font-weight: 600; }
+    .logo { fill: #1e4d3b; font-size: 22px; font-family: Palatino Linotype, Georgia, serif; font-weight: 700; }
+    .note { fill: #9a5b13; font-size: 13px; font-style: italic; }
+  </style>
+  <rect class="frame" x="1" y="1" width="1364" height="978" rx="6"/>
+
+  <!-- HEADER -->
+  <rect class="box" x="1" y="1" width="1364" height="72"/>
+  <rect class="brand" x="107" y="22" width="22" height="28" rx="3"/>
+  <text class="logo" x="139" y="45">Book Store</text>
+  <text class="t" x="290" y="43">Books</text>
+  <text class="t" x="356" y="43">Categories ▾</text>
+  <rect class="box" x="490" y="18" width="430" height="36" rx="6"/>
+  <text class="s" x="506" y="41">Search by title or author…</text>
+  <rect class="brand" x="878" y="22" width="36" height="28" rx="5"/>
+  <text class="w" x="887" y="41">🔍</text>
+  <text class="t" x="1000" y="43">Admin</text>
+  <text class="t" x="1070" y="43">Log in</text>
+  <rect class="brand" x="1142" y="18" width="117" height="36" rx="6"/>
+  <text class="w" x="1170" y="41">Register</text>
+  <text class="note" x="1259" y="68" text-anchor="end">Admin: ACTIVE admins only · logged in → "Hi, name" + Logout</text>
+
+  <!-- CONTENT -->
+  <text class="h" x="107" y="135">New books</text>
+  <text class="s" x="107" y="160">Newest first · 12 per page (US-19, US-20)</text>
+  <g id="cards">
+    <rect class="box" x="107" y="185" width="270" height="400" rx="8"/>
+    <rect class="fill" x="123" y="201" width="238" height="250" rx="4"/>
+    <text class="s" x="203" y="331">cover 2 : 3</text>
+    <text class="t" x="123" y="478">Book title, up to two lines…</text>
+    <text class="s" x="123" y="502">Author name</text>
+    <text class="t" x="123" y="540" font-weight="600">120.000 ₫</text>
+
+    <rect class="box" x="401" y="185" width="270" height="400" rx="8"/>
+    <rect class="fill" x="417" y="201" width="238" height="250" rx="4"/>
+    <text class="s" x="497" y="331">cover 2 : 3</text>
+    <text class="t" x="417" y="478">Book title</text>
+    <text class="s" x="417" y="502">Author name</text>
+    <text class="s" x="417" y="540" text-decoration="line-through">150.000 ₫</text>
+    <text class="note" x="500" y="540" font-style="normal" font-weight="600">120.000 ₫</text>
+    <rect x="590" y="526" width="48" height="20" rx="10" fill="#fbf1e2"/>
+    <text class="note" x="600" y="541" font-style="normal">-20%</text>
+    <text class="note" x="417" y="568">promo price = US-27 (CR-02)</text>
+
+    <rect class="box" x="695" y="185" width="270" height="400" rx="8"/>
+    <rect class="fill" x="711" y="201" width="238" height="250" rx="4"/>
+    <text class="s" x="791" y="331">cover 2 : 3</text>
+    <text class="t" x="711" y="478">Book title</text>
+    <text class="s" x="711" y="502">Author name</text>
+    <text class="t" x="711" y="540" font-weight="600">95.000 ₫</text>
+    <rect x="711" y="211" width="78" height="22" rx="11" fill="#fdecea"/>
+    <text x="722" y="227" fill="#b42318" font-size="12" font-weight="600">Sold Out</text>
+
+    <rect class="box" x="989" y="185" width="270" height="400" rx="8"/>
+    <rect class="fill" x="1005" y="201" width="238" height="250" rx="4"/>
+    <text class="s" x="1085" y="331">cover 2 : 3</text>
+    <text class="t" x="1005" y="478">Book title</text>
+    <text class="s" x="1005" y="502">Author name</text>
+    <text class="t" x="1005" y="540" font-weight="600">245.000 ₫</text>
+  </g>
+  <text class="s" x="107" y="612">… 4 columns ≥ 1024 px · 2 at 768 px · 1 at 375 px</text>
+  <rect class="box" x="560" y="640" width="246" height="40" rx="6"/>
+  <text class="t" x="575" y="666">‹ Prev   1   2   3   Next ›</text>
+
+  <!-- Categories dropdown (open), drawn last so it sits above the cards -->
+  <rect x="352" y="80" width="260" height="160" rx="8" fill="#1f1a17" opacity="0.08"/>
+  <rect class="box" x="350" y="76" width="260" height="160" rx="8"/>
+  <text class="t" x="366" y="102">Fiction</text>
+  <text class="t" x="366" y="130">Fantasy &amp; Science Fiction</text>
+  <text class="t" x="366" y="158">Children's Books</text>
+  <text class="t" x="366" y="186">Self-Help</text>
+  <text class="s" x="366" y="218">… visible categories only, A–Z</text>
+
+  <!-- FOOTER -->
+  <rect class="box" x="1" y="720" width="1364" height="258"/>
+  <text class="logo" x="107" y="765">Book Store</text>
+  <text class="s" x="107" y="792">Online catalogue of Ms. Le's book company</text>
+  <text class="s" x="107" y="814">(course case study – Release 1.0)</text>
+  <text class="s" x="107" y="836">support@bookstore.demo</text>
+  <text class="t" x="520" y="765" font-weight="600">Explore</text>
+  <text class="s" x="520" y="792">Books</text>
+  <text class="s" x="520" y="814">Log in</text>
+  <text class="s" x="520" y="836">Register</text>
+  <text class="t" x="860" y="765" font-weight="600">Project</text>
+  <text class="s" x="860" y="792">Software Project Management (72ITSE41503)</text>
+  <text class="s" x="860" y="814">Van Lang University · Team 02</text>
+  <line x1="107" y1="880" x2="1259" y2="880" stroke="#e7e0d6" stroke-width="1.5"/>
+  <text class="s" x="107" y="912">© 2026 Book Store · Team 02. Sample data for study purposes.</text>
+  <text class="note" x="900" y="912">footer stays at the bottom on short pages</text>
+</svg>
