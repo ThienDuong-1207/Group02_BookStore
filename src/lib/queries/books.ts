@@ -61,3 +61,34 @@ export async function listAdminBooks(
   }));
   return { rows, total: count ?? 0 };
 }
+
+/** The editable fields of one book (US-15 M1). */
+export type EditableBook = {
+  id: string;
+  title: string;
+  author_id: string;
+  category_id: string;
+  price: number;
+  stock: number;
+  description: string;
+  cover_url: string | null;
+};
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * One book that is not deleted, or null (US-15 E2: unknown, malformed or soft-deleted id → "Book not found").
+ * A malformed id is answered without a query, so PostgreSQL never sees it.
+ */
+export async function getEditableBook(supabase: SupabaseClient, id: string): Promise<EditableBook | null> {
+  if (!UUID.test(id)) return null;
+  const { data, error } = await supabase
+    .from("books")
+    .select("id, title, author_id, category_id, price, stock, description, cover_url")
+    .eq("id", id)
+    .is("deleted_at", null)
+    .maybeSingle<EditableBook>();
+  if (error) throw error;
+  return data ?? null;
+}
+
