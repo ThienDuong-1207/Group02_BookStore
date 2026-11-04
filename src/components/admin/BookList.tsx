@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { formatDate } from "@/lib/queries/users";
-import { formatPrice, type AdminBookRow } from "@/lib/queries/books";
+import { formatPrice } from "@/lib/format";
+import type { AdminBookRow } from "@/lib/queries/books";
 
 /**
  * Admin book list – cards on phones, a table from 768 px up (no sideways scrolling at 375 px).
