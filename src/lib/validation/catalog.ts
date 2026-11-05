@@ -61,6 +61,16 @@ export const CATALOG = {
     path: "/admin/categories",
     inUse: "Move or delete the books in this category first",
   }),
+  // US-18: same rules as categories, applied to authors (name up to 150 characters).
+  authors: catalogConfig({
+    table: "authors",
+    bookColumn: "author_id",
+    maxLength: 150,
+    label: "Author",
+    plural: "authors",
+    path: "/admin/authors",
+    inUse: "Move or delete the books by this author first",
+  }),
 } satisfies Record<string, CatalogConfig>;
 
 export type CatalogKind = keyof typeof CATALOG;

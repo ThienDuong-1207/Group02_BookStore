@@ -56,3 +56,13 @@ describe("categories (US-17)", () => {
     expect(CATALOG.categories.messages.inUse).toBe("Move or delete the books in this category first");
   });
 });
+
+describe("authors (US-18)", () => {
+  it("uses the same rules as categories, with names up to 150 characters", () => {
+    expect(CATALOG.authors.maxLength).toBe(150);
+    expect(CATALOG.authors.bookColumn).toBe("author_id");
+    expect(CATALOG.authors.messages.exists).toBe("Author already exists");
+    expect(CATALOG.authors.messages.required).toBe("Author name is required");
+    expect(CATALOG.authors.messages.inUse).toBe("Move or delete the books by this author first");
+  });
+});
