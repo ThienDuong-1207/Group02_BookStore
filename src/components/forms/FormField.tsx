@@ -8,6 +8,8 @@ type FormFieldProps = {
   error?: string;
   inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   maxLength?: number;
+  defaultValue?: string;
+  placeholder?: string;
 };
 
 /** Label + input + error shown right next to the field (US-10 B2). */
