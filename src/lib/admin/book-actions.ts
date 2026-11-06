@@ -1,12 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { checkAdmin } from "@/lib/admin/check-admin";
 import { BOOK_MESSAGES, type BookFormState } from "@/lib/admin/book-messages";
 import { MESSAGES } from "@/lib/auth/messages";
 import { checkCoverUrl } from "@/lib/books/cover-check";
-import { getEditableBook } from "@/lib/queries/books";
+import { getEditableBook, isUuid } from "@/lib/queries/books";
 import { createClient } from "@/lib/supabase/server";
 import { formDataToObject, toFieldErrors, type FieldErrors } from "@/lib/validation/auth";
 import { BOOK_FIELDS, bookSchema, toBookRow, type BookInput } from "@/lib/validation/books";
@@ -89,4 +90,36 @@ export async function updateBookAction(bookId: string, _prev: BookFormState, for
   revalidatePath("/books");
   revalidatePath(`/books/${bookId}`);
   return { success: BOOK_MESSAGES.saved };
+}
+
+/**
+ * US-16: admin deletes a book – a SOFT delete. `bookId` is bound by the Delete button (`deleteBookAction.bind(null, id)`).
+ * M1: only `deleted_at` is set, so the book disappears from everything customers see (`books_public` and every
+ * admin/customer query filter on `deleted_at is null`). M2: the row stays in the database – there is no `.delete()`
+ * here and RLS has no DELETE policy on `books`. E1 (Cancel) never reaches the server: the button asks first.
+ * An unknown, malformed or already deleted id answers "Book not found" and changes nothing.
+ */
+export async function deleteBookAction(bookId: string, _prev: BookFormState, formData: FormData): Promise<BookFormState> {
+  const check = await checkAdmin();
+  if (check.denied) return check.denied;
+  if (!isUuid(bookId)) return { formError: BOOK_MESSAGES.notFound };
+
+  const supabase = await createClient();
+  // `deleted_at is null` in the update makes a second click (or a second admin) a no-op instead of moving the date.
+  const { data, error } = await supabase
+    .from("books")
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", bookId)
+    .is("deleted_at", null)
+    .select("id");
+  if (error) return { formError: MESSAGES.unexpected };
+  if (!data || data.length === 0) return { formError: BOOK_MESSAGES.notFound };
+
+  revalidatePath("/admin/books");
+  revalidatePath("/books");
+  revalidatePath(`/books/${bookId}`); // B1: the detail page now answers "not found" (US-22)
+
+  // Back to the same page of the admin list, with a "Book deleted" message (the deleted row is gone from it).
+  const page = Number.parseInt(formData.get("page")?.toString() ?? "1", 10);
+  redirect(`/admin/books?page=${Number.isSafeInteger(page) && page > 1 ? page : 1}&deleted=1`);
 }
