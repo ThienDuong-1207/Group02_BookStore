@@ -5,7 +5,7 @@ import type { AdminBookRow } from "@/lib/queries/books";
 
 /**
  * Admin book list – cards on phones, a table from 768 px up (no sideways scrolling at 375 px).
- * `actions` renders the buttons of one row (Edit comes with US-15, Delete with US-16).
+ * `actions` renders the buttons of one row: Edit (US-15), Promotion (US-26), Delete (US-16).
  */
 export function BookList({ books, actions }: { books: AdminBookRow[]; actions?: (book: AdminBookRow) => React.ReactNode }) {
   if (books.length === 0) {

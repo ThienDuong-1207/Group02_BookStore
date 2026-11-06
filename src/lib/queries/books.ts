@@ -52,7 +52,14 @@ export async function listAdminBooks(
     .order("created_at", { ascending: false })
     .order("id", { ascending: false })
     .range(from, from + ADMIN_PAGE_SIZE - 1);
-  if (error) throw error;
+  if (error) {
+    // A page past the end (e.g. after deleting the last book of the last page, US-16) makes PostgREST answer
+    // "range not satisfiable" (PGRST103) without rows. Ask for the count alone so the page can go to the last page.
+    if (error.code !== "PGRST103") throw error;
+    const head = await supabase.from("books").select("id", { count: "exact", head: true }).is("deleted_at", null);
+    if (head.error) throw head.error;
+    return { rows: [], total: head.count ?? 0 };
+  }
 
   const rows = ((data ?? []) as unknown as AdminBookQueryRow[]).map(({ authors, categories, ...book }) => ({
     ...book,
@@ -76,12 +83,17 @@ export type EditableBook = {
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** True for a well-formed id, so a malformed one is answered without a query (PostgreSQL never sees it). */
+export function isUuid(id: string): boolean {
+  return UUID.test(id);
+}
+
 /**
  * One book that is not deleted, or null (US-15 E2: unknown, malformed or soft-deleted id → "Book not found").
  * A malformed id is answered without a query, so PostgreSQL never sees it.
  */
 export async function getEditableBook(supabase: SupabaseClient, id: string): Promise<EditableBook | null> {
-  if (!UUID.test(id)) return null;
+  if (!isUuid(id)) return null;
   const { data, error } = await supabase
     .from("books")
     .select("id, title, author_id, category_id, price, stock, description, cover_url")
@@ -91,4 +103,3 @@ export async function getEditableBook(supabase: SupabaseClient, id: string): Pro
   if (error) throw error;
   return data ?? null;
 }
-

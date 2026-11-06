@@ -1,19 +1,29 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ADMIN_PAGE_SIZE, listAdminBooks } from "@/lib/queries/books";
 import { AdminPager, BookList } from "@/components/admin/BookList";
+import { DeleteBookButton } from "@/components/admin/DeleteBookButton";
+import { BOOK_MESSAGES } from "@/lib/admin/book-messages";
 
 export const metadata: Metadata = { title: "Books – Admin – Book Store" };
 
-/** Admin book list, newest first, with an "Add book" button (US-05) Edit per row (US-15) and Promotion per row (US-26). Access: admin layout + RLS. */
-export default async function AdminBooksPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
-  const requested = Number.parseInt((await searchParams).page ?? "1", 10);
+/**
+ * Admin book list, newest first, with an "Add book" button (US-05) and per row Edit (US-15), Promotion (US-26)
+ * and Delete (US-16, soft delete). Access: admin layout + RLS.
+ */
+export default async function AdminBooksPage({ searchParams }: { searchParams: Promise<{ page?: string; deleted?: string }> }) {
+  const params = await searchParams;
+  const requested = Number.parseInt(params.page ?? "1", 10);
   const page = Number.isFinite(requested) && requested > 0 ? requested : 1;
 
   const supabase = await createClient();
   const { rows, total } = await listAdminBooks(supabase, page);
   const totalPages = Math.max(1, Math.ceil(total / ADMIN_PAGE_SIZE));
+  // Past the last page (e.g. the only book of the last page was just deleted): show the last page instead.
+  if (page > totalPages) redirect(`/admin/books?page=${totalPages}${params.deleted === "1" ? "&deleted=1" : ""}`);
+  const shownPage = page;
 
   return (
     <>
@@ -31,6 +41,12 @@ export default async function AdminBooksPage({ searchParams }: { searchParams: P
           Add book
         </Link>
       </div>
+
+      {params.deleted === "1" && (
+        <p role="status" className="mt-4 rounded-md border border-success bg-success-surface px-3 py-2 text-sm text-success">
+          {BOOK_MESSAGES.deleted}
+        </p>
+      )}
 
       <BookList
         books={rows}
@@ -50,10 +66,11 @@ export default async function AdminBooksPage({ searchParams }: { searchParams: P
             >
               Promotion
             </Link>
+            <DeleteBookButton bookId={book.id} title={book.title} page={shownPage} />
           </>
         )}
       />
-      <AdminPager page={Math.min(page, totalPages)} totalPages={totalPages} />
+      <AdminPager page={shownPage} totalPages={totalPages} />
     </>
   );
 }
