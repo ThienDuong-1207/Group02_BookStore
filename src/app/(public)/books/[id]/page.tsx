@@ -4,10 +4,15 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { BookCover } from "@/components/books/BookCover";
 import { formatPrice } from "@/lib/format";
+import { safeListHref } from "@/lib/books/list-href";
 import { getPublicBook } from "@/lib/queries/book-detail";
 import { createClient } from "@/lib/supabase/server";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = {
+  params: Promise<{ id: string }>;
+  /** `from`: the list URL the visitor came from (US-22), set by the book card. */
+  searchParams?: Promise<{ from?: string | string[] }>;
+};
 
 // One database read per request, shared by generateMetadata and the page.
 const loadBook = cache(async (id: string) => getPublicBook(await createClient(), id));
@@ -23,17 +28,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * M2: no "Add to Cart" button – shopping is out of scope for Release 1.0.
  * B1: one column on phones, cover beside the details from 768 px; long titles and descriptions wrap.
  * Unknown, malformed or soft-deleted id → 404 page (US-22 E1).
+ * US-22 M1 / B1: "Back to list" goes to the list page the visitor came from (same page, search and filters),
+ * or to `/books` page 1 when the page was opened directly. The browser Back button works as usual.
  */
-export default async function BookDetailPage({ params }: Props) {
+export default async function BookDetailPage({ params, searchParams }: Props) {
   const book = await loadBook((await params).id);
   if (!book) notFound();
+  const backHref = safeListHref((await searchParams)?.from);
 
   const inStock = book.stock > 0;
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:py-8">
       <Link
-        href="/books"
+        href={backHref}
         className="inline-flex min-h-11 items-center gap-1 rounded-md text-sm font-medium text-brand hover:underline focus-visible:outline-2 focus-visible:outline-brand"
       >
         <span aria-hidden="true">←</span> Back to list
