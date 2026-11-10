@@ -116,7 +116,19 @@ async function allCards(): Promise<Card[]> {
 async function main() {
   console.log(`UAT smoke test – ${BASE}\n`);
 
-  const home = await get("/books");
+  let home: Awaited<ReturnType<typeof get>>;
+  try {
+    home = await get("/books");
+  } catch (error) {
+    // Nothing listening (ECONNREFUSED), DNS error, no network…
+    console.error(
+      `✗ Cannot reach ${BASE} (${((error as Error & { cause?: { code?: string } }).cause?.code ?? (error as Error).message)}).\n` +
+        "  Is the site running? Locally: `npm run dev -- -p 3001` in another terminal (needs .env.local), wait for\n" +
+        "  \"Ready\", then run this again. Or run without --base to test production.",
+    );
+    process.exitCode = 1;
+    return;
+  }
   // Guard: make sure --base really is the Book Store (another app on the same port gives misleading FAILs).
   if (!/Book Store/.test(home.raw)) {
     const title = home.raw.match(/<title>([^<]*)<\/title>/)?.[1] ?? "no title";
