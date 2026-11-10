@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { formatPrice } from "@/lib/format";
+import { detailHref } from "@/lib/books/list-href";
 import type { EffectivePrice } from "@/lib/promotions/price";
 import type { BookListItem } from "@/lib/queries/book-list";
 import { BookCover } from "./BookCover";
@@ -14,11 +15,13 @@ export type BookCardBook = Pick<BookListItem, "id" | "title" | "author_name" | "
  * M1: cover, title, author, price ("120.000 ₫"). M3: the whole card opens `/books/[id]`.
  * E1: placeholder cover; long titles are cut to 2 lines with "…" (the full title stays in the link's name).
  * US-27: during an active promotion the price shows as original struck through + discounted price + "-x%".
+ * US-22: `listHref` is the list page this card is shown on; the detail link carries it so "Back to list"
+ * returns to the same page with the same search / filters.
  */
-export function BookCard({ book }: { book: BookCardBook }) {
+export function BookCard({ book, listHref }: { book: BookCardBook; listHref?: string }) {
   return (
     <Link
-      href={`/books/${book.id}`}
+      href={detailHref(book.id, listHref)}
       className="group flex h-full flex-col gap-3 rounded-lg border border-line bg-surface p-3 transition-shadow hover:border-brand hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
     >
       <BookCover src={book.cover_url} title={book.title} />
