@@ -87,6 +87,35 @@ describe("BookFilters filter panel (US-09)", () => {
   });
 });
 
+describe("BookFilters on phones (US-21 / GB-48)", () => {
+  it("M2: category + price fold behind a Filters button (closed on first load); search and Apply stay visible", () => {
+    const html = render();
+    expect(html).toMatch(/<button type="button" aria-expanded="false"[^>]*md:hidden/);
+    expect(html).toContain("hidden min-w-0 gap-3 md:contents");
+    // the search field and Apply are outside the folded wrapper
+    expect(html.indexOf('name="q"')).toBeLessThan(html.indexOf("aria-expanded"));
+    expect(html.lastIndexOf(">Apply</button>")).toBeGreaterThan(html.indexOf('name="maxPrice"'));
+  });
+
+  it("shows how many filters are active on the folded button", () => {
+    const html = render({ values: { q: "", category: CAT, minPrice: "1000", maxPrice: "" } });
+    expect(html).toContain("Filters<span");
+    expect(html).toContain("(2)");
+  });
+
+  it("opens by itself when the URL has a price error, so the message is visible", () => {
+    const html = render({ values: { ...empty, minPrice: "-5" }, errors: { minPrice: "Minimum price must be a whole number of 0 or more" } });
+    expect(html).toContain('aria-expanded="true"');
+    expect(html).toContain("grid min-w-0 gap-3 md:contents");
+  });
+
+  it("B1: controls are at least 44 px high and fields may shrink (no horizontal scrolling)", () => {
+    const html = render();
+    expect(html.match(/min-h-11/g)?.length ?? 0).toBeGreaterThanOrEqual(5);
+    expect(html).toContain("min-w-0");
+  });
+});
+
 describe("NoResults", () => {
   it('US-01 AC2: "No results found", the keyword (escaped), Clear search and Clear filters', () => {
     const html = renderToStaticMarkup(NoResults({ q: "xyz<123>", clearSearchHref: `/books?category=${CAT}` }));
