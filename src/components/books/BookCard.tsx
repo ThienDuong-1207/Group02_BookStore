@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { formatPrice } from "@/lib/format";
 import { detailHref } from "@/lib/books/list-href";
 import type { EffectivePrice } from "@/lib/promotions/price";
 import type { BookListItem } from "@/lib/queries/book-list";
 import { BookCover } from "./BookCover";
+import { PriceTag } from "./PriceTag";
 
 export type BookCardBook = Pick<BookListItem, "id" | "title" | "author_name" | "price" | "cover_url"> & {
   /** Today's price with any active promotion (US-27). Without it the card shows `price`. */
@@ -30,28 +30,10 @@ export function BookCard({ book, listHref }: { book: BookCardBook; listHref?: st
           {book.title}
         </h2>
         <p className="truncate text-sm text-muted">{book.author_name}</p>
-        <CardPrice price={book.price} pricing={book.pricing} />
+        <p className="mt-auto pt-1">
+          <PriceTag price={book.price} pricing={book.pricing} />
+        </p>
       </div>
     </Link>
-  );
-}
-
-/**
- * US-27 (CR-02 AC3): "150.000 ₫" struck through, "120.000 ₫" in the accent colour and a "-20%" label
- * (style guide §4 "Promotion price"). AC2: without an active promotion only the original price is shown.
- * Screen readers hear "Original price … Sale price …" instead of two bare numbers.
- */
-function CardPrice({ price, pricing }: { price: number; pricing?: EffectivePrice }) {
-  if (!pricing || pricing.discountPercent === null) {
-    return <p className="mt-auto pt-1 font-semibold">{formatPrice(pricing?.price ?? price)}</p>;
-  }
-  return (
-    <p className="mt-auto flex flex-wrap items-center gap-x-2 gap-y-1 pt-1">
-      <span className="sr-only">Original price </span>
-      <del className="text-sm text-muted">{formatPrice(pricing.originalPrice)}</del>
-      <span className="sr-only">Sale price </span>
-      <span className="font-semibold text-accent">{formatPrice(pricing.price)}</span>
-      <span className="rounded-full bg-accent-surface px-2 py-0.5 text-xs font-semibold text-accent">-{pricing.discountPercent}%</span>
-    </p>
   );
 }

@@ -3,9 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { BookCover } from "@/components/books/BookCover";
-import { formatPrice } from "@/lib/format";
+import { PriceTag } from "@/components/books/PriceTag";
 import { safeListHref } from "@/lib/books/list-href";
 import { getPublicBook } from "@/lib/queries/book-detail";
+import { getPromotion } from "@/lib/queries/promotions";
+import { effectivePrice, isPromotionActive, todayInVietnam } from "@/lib/promotions/price";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -30,11 +32,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * Unknown, malformed or soft-deleted id → 404 page (US-22 E1).
  * US-22 M1 / B1: "Back to list" goes to the list page the visitor came from (same page, search and filters),
  * or to `/books` page 1 when the page was opened directly. The browser Back button works as usual.
+ * US-28 (CR-02): the price comes from the same US-26 service as the list (US-27), for today in Vietnam:
+ * AC1 active promotion → original price struck through, sale price and "-x%"; AC2 / CR-02 AC4 after the end date
+ * (or before the start) → only the original price; AC3 the start and end days are both included.
+ * The page is rendered on every request, so the price changes on the day the promotion ends, with no redeploy.
  */
 export default async function BookDetailPage({ params, searchParams }: Props) {
   const book = await loadBook((await params).id);
   if (!book) notFound();
   const backHref = safeListHref((await searchParams)?.from);
+
+  // If the promotion cannot be loaded, show the original price (same fallback as the list, US-27).
+  const promotion = await getPromotion(await createClient(), book.id).catch((error: unknown) => {
+    console.error("Could not load the promotion of a book", error);
+    return null;
+  });
+  const today = todayInVietnam();
+  const pricing = effectivePrice(book.price, promotion, today);
+  const saleEnds = promotion && isPromotionActive(promotion, today) ? formatDay(promotion.end_date) : null;
 
   const inStock = book.stock > 0;
 
@@ -68,7 +83,10 @@ export default async function BookDetailPage({ params, searchParams }: Props) {
 
           <dl className="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-2 rounded-lg border border-line bg-surface p-4">
             <dt className="text-sm text-muted">Price</dt>
-            <dd className="text-xl font-semibold">{formatPrice(book.price)}</dd>
+            <dd>
+              <PriceTag price={book.price} pricing={pricing} size="detail" />
+              {saleEnds && <p className="mt-1 text-sm text-muted">Promotion until {saleEnds}</p>}
+            </dd>
             <dt className="text-sm text-muted">Availability</dt>
             <dd>
               {inStock ? (
@@ -89,4 +107,10 @@ export default async function BookDetailPage({ params, searchParams }: Props) {
       </article>
     </main>
   );
+}
+
+/** "2026-11-15" → "15/11/2026" (dates are calendar days in Vietnam, US-26). */
+function formatDay(isoDate: string): string {
+  const [year, month, day] = isoDate.split("-");
+  return `${day}/${month}/${year}`;
 }
