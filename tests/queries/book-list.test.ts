@@ -18,10 +18,15 @@ function fakeClient(result: Result, headCount = 0) {
     range?: [number, number];
     ilike: [string, string][];
     headIlike: [string, string][];
-  } = { order: [], ilike: [], headIlike: [] };
+    where: [string, string, unknown][];
+    headWhere: [string, string, unknown][];
+  } = { order: [], ilike: [], headIlike: [], where: [], headWhere: [] };
   // The count-only query (head: true) is awaited after its filters, so it is a "thenable" builder of its own.
   const head = {
     ilike: vi.fn((column: string, pattern: string) => (calls.headIlike.push([column, pattern]), head)),
+    eq: vi.fn((column: string, value: unknown) => (calls.headWhere.push(["eq", column, value]), head)),
+    gte: vi.fn((column: string, value: unknown) => (calls.headWhere.push(["gte", column, value]), head)),
+    lte: vi.fn((column: string, value: unknown) => (calls.headWhere.push(["lte", column, value]), head)),
     then: (resolve: (value: unknown) => void) => resolve({ count: headCount, error: null }),
   };
   const builder = {
@@ -32,6 +37,9 @@ function fakeClient(result: Result, headCount = 0) {
       return builder;
     }),
     ilike: vi.fn((column: string, pattern: string) => (calls.ilike.push([column, pattern]), builder)),
+    eq: vi.fn((column: string, value: unknown) => (calls.where.push(["eq", column, value]), builder)),
+    gte: vi.fn((column: string, value: unknown) => (calls.where.push(["gte", column, value]), builder)),
+    lte: vi.fn((column: string, value: unknown) => (calls.where.push(["lte", column, value]), builder)),
     order: vi.fn((column: string, options: unknown) => (calls.order.push([column, options]), builder)),
     range: vi.fn(async (from: number, to: number) => ((calls.range = [from, to]), result)),
   };
@@ -88,6 +96,43 @@ describe("listPublicBooks", () => {
     const { client, calls } = fakeClient({ data: null, error: { code: "PGRST103" }, count: null }, 14);
     await expect(listPublicBooks(client, 5, { q: "harry" })).resolves.toEqual({ books: [], total: 14 });
     expect(calls.headIlike).toEqual([["search_text", "%harry%"]]);
+  });
+
+  it("US-09 AC1: one category", async () => {
+    const { client, calls } = fakeClient({ data: [], error: null, count: 0 });
+    await listPublicBooks(client, 1, { categoryId: "cat-1" });
+    expect(calls.where).toEqual([["eq", "category_id", "cat-1"]]);
+  });
+
+  it("US-09 AC2 (CR-02) + B1: inclusive range on the ORIGINAL price column", async () => {
+    const { client, calls } = fakeClient({ data: [], error: null, count: 0 });
+    await listPublicBooks(client, 1, { minPrice: 120000, maxPrice: 120000 });
+    expect(calls.where).toEqual([
+      ["gte", "price", 120000],
+      ["lte", "price", 120000],
+    ]);
+  });
+
+  it("US-09 B2: only a minimum (or a minimum of 0) is applied on its own", async () => {
+    const { client, calls } = fakeClient({ data: [], error: null, count: 0 });
+    await listPublicBooks(client, 1, { minPrice: 0 });
+    expect(calls.where).toEqual([["gte", "price", 0]]);
+  });
+
+  it("US-25 B2: search AND category AND price, also on the count-only fallback", async () => {
+    const filters = { q: "harry", categoryId: "cat-1", minPrice: 1, maxPrice: 200000 };
+    const page = fakeClient({ data: [], error: null, count: 0 });
+    await listPublicBooks(page.client, 1, filters);
+    expect(page.calls.ilike).toEqual([["search_text", "%harry%"]]);
+    expect(page.calls.where).toEqual([
+      ["eq", "category_id", "cat-1"],
+      ["gte", "price", 1],
+      ["lte", "price", 200000],
+    ]);
+
+    const past = fakeClient({ data: null, error: { code: "PGRST103" }, count: null }, 13);
+    await expect(listPublicBooks(past.client, 4, filters)).resolves.toEqual({ books: [], total: 13 });
+    expect(past.calls.headWhere).toEqual(page.calls.where);
   });
 
   it("throws other database errors", async () => {

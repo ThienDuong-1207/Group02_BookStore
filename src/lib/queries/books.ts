@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { isUuid } from "@/lib/books/ids";
 
 /** One author or category in the book form dropdowns. */
 export type Option = { id: string; name: string };
@@ -81,12 +82,8 @@ export type EditableBook = {
   cover_url: string | null;
 };
 
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-/** True for a well-formed id, so a malformed one is answered without a query (PostgreSQL never sees it). */
-export function isUuid(id: string): boolean {
-  return UUID.test(id);
-}
+// Moved to a dependency-free module so the client-side filter form can use it too (US-09); re-exported here.
+export { isUuid };
 
 /**
  * One book that is not deleted, or null (US-15 E2: unknown, malformed or soft-deleted id → "Book not found").
