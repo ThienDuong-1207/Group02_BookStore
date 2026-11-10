@@ -39,5 +39,11 @@ The seed (`scripts/seed.ts`) reads `.env.local`: it needs `SUPABASE_SERVICE_ROLE
 npm run lint && npm run typecheck && npm test && npm run build
 ```
 
+UAT smoke test of the customer pages on a running site (read-only; cases in `docs/test-cases/UAT-S3.md`):
+```bash
+npm run test:uat                                   # production
+npm run test:uat -- --base http://localhost:3000   # local
+```
+
 ## Team
 Dương Chí Thiện (repo admin, Sprint 1 Leader) · Bùi Gia Phát (Sprint 2 Leader) · Dương Ngọc Linh Đan (Product Owner, Sprint 3 Leader)
