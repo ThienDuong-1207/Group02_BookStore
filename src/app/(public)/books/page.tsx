@@ -25,6 +25,7 @@ type SearchParams = Record<string, string | string[] | undefined>;
  * US-09: `?category=&minPrice=&maxPrice=` filter by category and ORIGINAL price (CR-02), inclusive.
  * The URL is checked here on the server too: an invalid price range shows the message and is not applied.
  * The count, page numbers and "past the end" redirect all use the filtered total, and page links keep the filters.
+ * US-22: every card links to its detail page with this exact list URL, so "Back to list" comes back here.
  */
 export default async function BooksPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const params = await searchParams;
@@ -75,7 +76,7 @@ export default async function BooksPage({ searchParams }: { searchParams: Promis
       {filtering && total === 0 ? (
         <NoResults q={values.q} clearSearchHref={filtersHref({ ...values, q: "" })} />
       ) : (
-        <BookGrid books={cards} />
+        <BookGrid books={cards} listHref={pageHref("/books", params, page)} />
       )}
 
       <Pagination page={page} totalPages={lastPage} pathname="/books" params={params} />
