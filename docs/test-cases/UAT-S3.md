@@ -6,7 +6,7 @@ Test cases for the demo in the Sprint Review S3 video script (part 4C, "Demo Inc
 
 ```bash
 npm run test:uat                                   # production: https://group02-book-store.vercel.app
-npm run test:uat -- --base http://localhost:3000   # a local `npm run dev`
+npm run test:uat -- --base http://localhost:3001   # local: `npm run dev -- -p 3001` (needs .env.local)
 ```
 
 `scripts/uat-smoke.ts` only sends GET requests to the customer pages (no login, changes nothing). It prints PASS / FAIL / SKIP per check and exits with code 1 if anything fails.

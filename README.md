@@ -42,7 +42,7 @@ npm run lint && npm run typecheck && npm test && npm run build
 UAT smoke test of the customer pages on a running site (read-only; cases in `docs/test-cases/UAT-S3.md`):
 ```bash
 npm run test:uat                                   # production
-npm run test:uat -- --base http://localhost:3000   # local
+npm run test:uat -- --base http://localhost:3001   # local: npm run dev -- -p 3001 (needs .env.local)
 ```
 
 ## Team

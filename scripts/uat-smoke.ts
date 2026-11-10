@@ -2,7 +2,7 @@
  * Sprint 3 UAT smoke test – checks the customer pages of a running site (no login, read-only: GET requests only).
  *
  *   npm run test:uat                                   # production (https://group02-book-store.vercel.app)
- *   npm run test:uat -- --base http://localhost:3000   # local `npm run dev` / `npm start`
+ *   npm run test:uat -- --base http://localhost:3001   # local `npm run dev -- -p 3001` (needs .env.local)
  *
  * Each check prints PASS / FAIL / SKIP with the test case ID from docs/test-cases/UAT-S3.md.
  * SKIP = the seed data has nothing to test with (e.g. no book on promotion today); add the demo data and run again.
@@ -117,6 +117,17 @@ async function main() {
   console.log(`UAT smoke test – ${BASE}\n`);
 
   const home = await get("/books");
+  // Guard: make sure --base really is the Book Store (another app on the same port gives misleading FAILs).
+  if (!/Book Store/.test(home.raw)) {
+    const title = home.raw.match(/<title>([^<]*)<\/title>/)?.[1] ?? "no title";
+    console.error(
+      `✗ ${BASE}/books is not the Book Store (HTTP ${home.status}, page title "${title}").\n` +
+        "  Another app may be using this port. Start the Book Store (e.g. `npm run dev -- -p 3001`, needs .env.local)\n" +
+        "  and pass --base http://localhost:3001, or run without --base to test production.",
+    );
+    process.exitCode = 1;
+    return;
+  }
   const homeCards = cards(home.html);
   const homeSummary = summary(home.html);
   const everyCard = await allCards();
