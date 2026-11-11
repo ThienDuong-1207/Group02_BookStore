@@ -52,3 +52,27 @@ describe("BookCard (US-19)", () => {
     expect(html).not.toContain("<script>");
   });
 });
+
+/** US-06 M2 / B1: "Sold Out" badge on the customer card when stock = 0. */
+describe("BookCard Sold Out badge (US-06)", () => {
+  it("M2: stock 0 → Sold Out badge on the card", () => {
+    const html = render({ ...book, stock: 0 });
+    expect(html).toContain("Sold Out");
+    expect(html).toContain("bg-danger-surface");
+  });
+
+  it("B1: stock 1 or more → no badge (0 → 1 removes it)", () => {
+    expect(render({ ...book, stock: 1 })).not.toContain("Sold Out");
+    expect(render({ ...book, stock: 25 })).not.toContain("Sold Out");
+  });
+
+  it("no stock information → no badge", () => {
+    expect(render(book)).not.toContain("Sold Out");
+  });
+
+  it("the card still shows the price and links to the detail page when sold out", () => {
+    const html = render({ ...book, stock: 0 });
+    expect(html).toMatch(/120\.000\s₫/);
+    expect(html).toContain(`href="/books/${book.id}"`);
+  });
+});
