@@ -20,9 +20,11 @@ export type BookCardBook = Pick<BookListItem, "id" | "title" | "author_name" | "
  * US-27: during an active promotion the price shows as original struck through + discounted price + "-x%".
  * US-22: `listHref` is the list page this card is shown on; the detail link carries it so "Back to list"
  * returns to the same page with the same search / filters.
- * US-06 AC1 / AC3: stock 0 → a "Sold Out" label on the cover; as soon as stock is 1 or more it is gone.
+ * US-06 M2 / B1: a book with stock = 0 shows a "Sold Out" badge on its cover (style guide §4 "Badges");
+ * it disappears as soon as the admin sets the stock back to 1 or more.
  */
 export function BookCard({ book, listHref }: { book: BookCardBook; listHref?: string }) {
+  const soldOut = book.stock === 0;
   return (
     <Link
       href={detailHref(book.id, listHref)}
@@ -30,7 +32,7 @@ export function BookCard({ book, listHref }: { book: BookCardBook; listHref?: st
     >
       <div className="relative">
         <BookCover src={book.cover_url} title={book.title} />
-        {book.stock === 0 && <SoldOutBadge className="absolute top-2 left-2 shadow-sm" />}
+        {soldOut && <SoldOutBadge className="absolute top-2 left-2 shadow-sm" />}
       </div>
       <div className="flex flex-1 flex-col gap-1">
         <h2 title={book.title} className="line-clamp-2 font-serif text-base leading-snug font-semibold break-words group-hover:text-brand">
