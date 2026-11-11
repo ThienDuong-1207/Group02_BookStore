@@ -3,11 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { BookCover } from "@/components/books/BookCover";
-import { formatPrice } from "@/lib/format";
+import { PriceTag } from "@/components/books/PriceTag";
+import { SoldOutBadge } from "@/components/books/SoldOutBadge";
 import { safeListHref } from "@/lib/books/list-href";
 import { getPublicBook } from "@/lib/queries/book-detail";
 import { getPromotion } from "@/lib/queries/promotions";
-import { effectivePrice, todayInVietnam, type EffectivePrice } from "@/lib/promotions/price";
+import { effectivePrice, isPromotionActive, todayInVietnam } from "@/lib/promotions/price";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -32,23 +33,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * Unknown, malformed or soft-deleted id → 404 page (US-22 E1).
  * US-22 M1 / B1: "Back to list" goes to the list page the visitor came from (same page, search and filters),
  * or to `/books` page 1 when the page was opened directly. The browser Back button works as usual.
- * US-28 (CR-02): during an active promotion the price shows as original struck through + sale price + "-x%";
- * before the start date or after the end date only the original price (AC2). Start and end day count (AC3).
- * Same US-26 price service as the list cards (US-27), so list and detail always show the same price.
+ * US-28 (CR-02): the price comes from the same US-26 service as the list (US-27), for today in Vietnam:
+ * AC1 active promotion → original price struck through, sale price and "-x%"; AC2 / CR-02 AC4 after the end date
+ * (or before the start) → only the original price; AC3 the start and end days are both included.
+ * The page is rendered on every request, so the price changes on the day the promotion ends, with no redeploy.
  */
 export default async function BookDetailPage({ params, searchParams }: Props) {
   const book = await loadBook((await params).id);
   if (!book) notFound();
   const backHref = safeListHref((await searchParams)?.from);
 
-  const inStock = book.stock > 0;
-  const supabase = await createClient();
-  // If promotions cannot be read, the page still works and shows the original price (= "no active promotion").
-  const promotion = await getPromotion(supabase, book.id).catch((error: unknown) => {
-    console.error("Could not load the promotion of book", book.id, error);
+  // If the promotion cannot be loaded, show the original price (same fallback as the list, US-27).
+  const promotion = await getPromotion(await createClient(), book.id).catch((error: unknown) => {
+    console.error("Could not load the promotion of a book", error);
     return null;
   });
-  const pricing = effectivePrice(book.price, promotion, todayInVietnam());
+  const today = todayInVietnam();
+  const pricing = effectivePrice(book.price, promotion, today);
+  const saleEnds = promotion && isPromotionActive(promotion, today) ? formatDay(promotion.end_date) : null;
+
+  const inStock = book.stock > 0;
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:py-8">
@@ -81,14 +85,15 @@ export default async function BookDetailPage({ params, searchParams }: Props) {
           <dl className="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-2 rounded-lg border border-line bg-surface p-4">
             <dt className="text-sm text-muted">Price</dt>
             <dd>
-              <DetailPrice pricing={pricing} />
+              <PriceTag price={book.price} pricing={pricing} size="detail" />
+              {saleEnds && <p className="mt-1 text-sm text-muted">Promotion until {saleEnds}</p>}
             </dd>
             <dt className="text-sm text-muted">Availability</dt>
             <dd>
               {inStock ? (
                 <span className="rounded-full bg-success-surface px-2.5 py-0.5 text-sm font-medium text-success">In stock</span>
               ) : (
-                <span className="rounded-full bg-danger-surface px-2.5 py-0.5 text-sm font-medium text-danger">Sold Out</span>
+                <SoldOutBadge className="text-sm" />
               )}
             </dd>
           </dl>
@@ -105,21 +110,8 @@ export default async function BookDetailPage({ params, searchParams }: Props) {
   );
 }
 
-/**
- * US-28 AC1: "150.000 ₫" struck through, "120.000 ₫" in the accent colour and "-20%" (style guide §4
- * "Promotion price", same look as the list card). AC2: no active promotion → only the original price.
- */
-function DetailPrice({ pricing }: { pricing: EffectivePrice }) {
-  if (pricing.discountPercent === null) {
-    return <span className="text-xl font-semibold">{formatPrice(pricing.price)}</span>;
-  }
-  return (
-    <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-      <span className="sr-only">Sale price </span>
-      <span className="text-xl font-semibold text-accent">{formatPrice(pricing.price)}</span>
-      <span className="sr-only">Original price </span>
-      <del className="text-muted">{formatPrice(pricing.originalPrice)}</del>
-      <span className="rounded-full bg-accent-surface px-2 py-0.5 text-sm font-semibold text-accent">-{pricing.discountPercent}%</span>
-    </span>
-  );
+/** "2026-11-15" → "15/11/2026" (dates are calendar days in Vietnam, US-26). */
+function formatDay(isoDate: string): string {
+  const [year, month, day] = isoDate.split("-");
+  return `${day}/${month}/${year}`;
 }
