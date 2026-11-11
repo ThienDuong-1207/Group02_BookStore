@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { cache } from "react";
 import { BookCover } from "@/components/books/BookCover";
 import { PriceTag } from "@/components/books/PriceTag";
+import { SoldOutBadge } from "@/components/books/SoldOutBadge";
 import { safeListHref } from "@/lib/books/list-href";
 import { getPublicBook } from "@/lib/queries/book-detail";
 import { getPromotion } from "@/lib/queries/promotions";
@@ -92,7 +93,7 @@ export default async function BookDetailPage({ params, searchParams }: Props) {
               {inStock ? (
                 <span className="rounded-full bg-success-surface px-2.5 py-0.5 text-sm font-medium text-success">In stock</span>
               ) : (
-                <span className="rounded-full bg-danger-surface px-2.5 py-0.5 text-sm font-medium text-danger">Sold Out</span>
+                <SoldOutBadge className="text-sm" />
               )}
             </dd>
           </dl>
