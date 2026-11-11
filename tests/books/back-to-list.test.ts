@@ -24,7 +24,7 @@ vi.mock("@/lib/queries/categories", async () => {
   const actual = await vi.importActual<typeof import("@/lib/queries/categories")>("@/lib/queries/categories");
   return { ...actual, listMenuCategories: async () => [{ id: CATEGORY, name: "Fiction" }] };
 });
-vi.mock("@/lib/queries/promotions", () => ({ getPromotionsForBooks: async () => new Map() }));
+vi.mock("@/lib/queries/promotions", () => ({ getPromotionsForBooks: async () => new Map(), getPromotion: async () => null }));
 vi.mock("@/lib/queries/book-detail", () => ({
   getPublicBook: async (_supabase: unknown, id: string) =>
     id === ID

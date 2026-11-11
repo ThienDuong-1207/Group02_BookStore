@@ -8,6 +8,8 @@ import { BookCover } from "./BookCover";
 export type BookCardBook = Pick<BookListItem, "id" | "title" | "author_name" | "price" | "cover_url"> & {
   /** Today's price with any active promotion (US-27). Without it the card shows `price`. */
   pricing?: EffectivePrice;
+  /** Copies in stock (US-06). 0 → "Sold Out" badge. Unknown (undefined) → no badge. */
+  stock?: number;
 };
 
 /**
@@ -17,14 +19,24 @@ export type BookCardBook = Pick<BookListItem, "id" | "title" | "author_name" | "
  * US-27: during an active promotion the price shows as original struck through + discounted price + "-x%".
  * US-22: `listHref` is the list page this card is shown on; the detail link carries it so "Back to list"
  * returns to the same page with the same search / filters.
+ * US-06 M2 / B1: a book with stock = 0 shows a "Sold Out" badge on its cover (style guide §4 "Badges");
+ * it disappears as soon as the admin sets the stock back to 1 or more.
  */
 export function BookCard({ book, listHref }: { book: BookCardBook; listHref?: string }) {
+  const soldOut = book.stock === 0;
   return (
     <Link
       href={detailHref(book.id, listHref)}
       className="group flex h-full flex-col gap-3 rounded-lg border border-line bg-surface p-3 transition-shadow hover:border-brand hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
     >
-      <BookCover src={book.cover_url} title={book.title} />
+      <div className="relative">
+        <BookCover src={book.cover_url} title={book.title} />
+        {soldOut && (
+          <span className="absolute top-2 left-2 rounded-full bg-danger-surface px-2 py-0.5 text-xs font-semibold text-danger shadow-sm">
+            Sold Out
+          </span>
+        )}
+      </div>
       <div className="flex flex-1 flex-col gap-1">
         <h2 title={book.title} className="line-clamp-2 font-serif text-base leading-snug font-semibold break-words group-hover:text-brand">
           {book.title}
