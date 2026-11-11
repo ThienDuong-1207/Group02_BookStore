@@ -6,6 +6,8 @@ import { BookCover } from "@/components/books/BookCover";
 import { formatPrice } from "@/lib/format";
 import { safeListHref } from "@/lib/books/list-href";
 import { getPublicBook } from "@/lib/queries/book-detail";
+import { getPromotion } from "@/lib/queries/promotions";
+import { effectivePrice, todayInVietnam, type EffectivePrice } from "@/lib/promotions/price";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -30,6 +32,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * Unknown, malformed or soft-deleted id → 404 page (US-22 E1).
  * US-22 M1 / B1: "Back to list" goes to the list page the visitor came from (same page, search and filters),
  * or to `/books` page 1 when the page was opened directly. The browser Back button works as usual.
+ * US-28 (CR-02): during an active promotion the price shows as original struck through + sale price + "-x%";
+ * before the start date or after the end date only the original price (AC2). Start and end day count (AC3).
+ * Same US-26 price service as the list cards (US-27), so list and detail always show the same price.
  */
 export default async function BookDetailPage({ params, searchParams }: Props) {
   const book = await loadBook((await params).id);
@@ -37,6 +42,13 @@ export default async function BookDetailPage({ params, searchParams }: Props) {
   const backHref = safeListHref((await searchParams)?.from);
 
   const inStock = book.stock > 0;
+  const supabase = await createClient();
+  // If promotions cannot be read, the page still works and shows the original price (= "no active promotion").
+  const promotion = await getPromotion(supabase, book.id).catch((error: unknown) => {
+    console.error("Could not load the promotion of book", book.id, error);
+    return null;
+  });
+  const pricing = effectivePrice(book.price, promotion, todayInVietnam());
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:py-8">
@@ -68,7 +80,9 @@ export default async function BookDetailPage({ params, searchParams }: Props) {
 
           <dl className="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-2 rounded-lg border border-line bg-surface p-4">
             <dt className="text-sm text-muted">Price</dt>
-            <dd className="text-xl font-semibold">{formatPrice(book.price)}</dd>
+            <dd>
+              <DetailPrice pricing={pricing} />
+            </dd>
             <dt className="text-sm text-muted">Availability</dt>
             <dd>
               {inStock ? (
@@ -88,5 +102,24 @@ export default async function BookDetailPage({ params, searchParams }: Props) {
         </div>
       </article>
     </main>
+  );
+}
+
+/**
+ * US-28 AC1: "150.000 ₫" struck through, "120.000 ₫" in the accent colour and "-20%" (style guide §4
+ * "Promotion price", same look as the list card). AC2: no active promotion → only the original price.
+ */
+function DetailPrice({ pricing }: { pricing: EffectivePrice }) {
+  if (pricing.discountPercent === null) {
+    return <span className="text-xl font-semibold">{formatPrice(pricing.price)}</span>;
+  }
+  return (
+    <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      <span className="sr-only">Sale price </span>
+      <span className="text-xl font-semibold text-accent">{formatPrice(pricing.price)}</span>
+      <span className="sr-only">Original price </span>
+      <del className="text-muted">{formatPrice(pricing.originalPrice)}</del>
+      <span className="rounded-full bg-accent-surface px-2 py-0.5 text-sm font-semibold text-accent">-{pricing.discountPercent}%</span>
+    </span>
   );
 }
