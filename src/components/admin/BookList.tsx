@@ -4,7 +4,9 @@ import { formatPrice } from "@/lib/format";
 import type { AdminBookRow } from "@/lib/queries/books";
 
 /**
- * Admin book list – cards on phones, a table from 768 px up (no sideways scrolling at 375 px).
+ * Admin book list – cards below 1024 px (1 column on phones, 2 on tablets), a table from 1024 px up.
+ * US-21 AC3 / DEF-07: at 768 px the 7-column table + 3 buttons did not fit and was cut off, so tablets get cards;
+ * the table box scrolls inside itself (`overflow-x-auto`) instead of clipping if a row is ever too wide.
  * `actions` renders the buttons of one row: Edit (US-15), Promotion (US-26), Delete (US-16).
  */
 export function BookList({ books, actions }: { books: AdminBookRow[]; actions?: (book: AdminBookRow) => React.ReactNode }) {
@@ -13,7 +15,7 @@ export function BookList({ books, actions }: { books: AdminBookRow[]; actions?: 
   }
   return (
     <>
-      <ul className="mt-6 flex flex-col gap-3 md:hidden">
+      <ul className="mt-6 grid gap-3 md:grid-cols-2 lg:hidden">
         {books.map((book) => (
           <li key={book.id} className="rounded-lg border border-line bg-surface p-4">
             <p className="font-medium break-words">{book.title}</p>
@@ -30,7 +32,7 @@ export function BookList({ books, actions }: { books: AdminBookRow[]; actions?: 
         ))}
       </ul>
 
-      <div className="mt-6 hidden overflow-hidden rounded-lg border border-line bg-surface md:block">
+      <div className="relative mt-6 hidden overflow-x-auto rounded-lg border border-line bg-surface lg:block">
         <table className="w-full text-left text-sm">
           <thead className="border-b border-line bg-background text-xs tracking-wide text-muted uppercase">
             <tr>

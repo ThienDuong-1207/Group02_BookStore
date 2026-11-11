@@ -2,7 +2,7 @@ import { formatDate, type UserRow } from "@/lib/queries/users";
 import { LockToggle } from "@/components/admin/LockToggle";
 
 /**
- * US-14 M1: the user list – cards on phones, a table from 768 px up. `meId` marks the logged-in admin.
+ * US-14 M1: the user list – cards below 1024 px (2 columns on tablets), a table from 1024 px up (US-21 AC3). `meId` marks the logged-in admin.
  * M3 / E2: each row has a Lock / Unlock button (disabled for the admin's own account).
  */
 export function UserList({ users, meId }: { users: UserRow[]; meId?: string }) {
@@ -11,8 +11,8 @@ export function UserList({ users, meId }: { users: UserRow[]; meId?: string }) {
   }
   return (
     <>
-      {/* Phone: one card per user, so nothing scrolls sideways at 375 px (US-21). */}
-      <ul className="mt-6 flex flex-col gap-3 md:hidden">
+      {/* Phone and tablet: one card per user, so nothing scrolls sideways (US-21). */}
+      <ul className="mt-6 grid gap-3 md:grid-cols-2 lg:hidden">
         {users.map((user) => (
           <li key={user.id} className="rounded-lg border border-line bg-surface p-4">
             <p className="font-medium break-words">
@@ -32,8 +32,8 @@ export function UserList({ users, meId }: { users: UserRow[]; meId?: string }) {
         ))}
       </ul>
 
-      {/* Tablet and desktop: table. */}
-      <div className="mt-6 hidden overflow-hidden rounded-lg border border-line bg-surface md:block">
+      {/* Desktop (≥ 1024 px): table. */}
+      <div className="relative mt-6 hidden overflow-x-auto rounded-lg border border-line bg-surface lg:block">
         <table className="w-full text-left text-sm">
           <thead className="border-b border-line bg-background text-xs tracking-wide text-muted uppercase">
             <tr>
@@ -65,7 +65,7 @@ function UserTableRow({ user, isMe }: { user: UserRow; isMe: boolean }) {
         {user.full_name}
         {isMe && <YouTag />}
       </td>
-      <td className="px-4 py-3 break-words text-muted">{user.email}</td>
+      <td className="px-4 py-3 break-all text-muted">{user.email}</td>
       <td className="px-4 py-3">
         <RoleBadge role={user.role} />
       </td>
