@@ -2,12 +2,14 @@ import Link from "next/link";
 import { formatDate } from "@/lib/queries/users";
 import { formatPrice } from "@/lib/format";
 import type { AdminBookRow } from "@/lib/queries/books";
+import { SoldOutBadge } from "@/components/books/SoldOutBadge";
 
 /**
  * Admin book list – cards below 1024 px (1 column on phones, 2 on tablets), a table from 1024 px up.
  * US-21 AC3 / DEF-07: at 768 px the 7-column table + 3 buttons did not fit and was cut off, so tablets get cards;
  * the table box scrolls inside itself (`overflow-x-auto`) instead of clipping if a row is ever too wide.
  * `actions` renders the buttons of one row: Edit (US-15), Promotion (US-26), Delete (US-16).
+ * US-06 M1: the stock of every book is listed, with a "Sold Out" label at 0 (stock is changed in Edit).
  */
 export function BookList({ books, actions }: { books: AdminBookRow[]; actions?: (book: AdminBookRow) => React.ReactNode }) {
   if (books.length === 0) {
@@ -24,7 +26,10 @@ export function BookList({ books, actions }: { books: AdminBookRow[]; actions?: 
             </p>
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
               <span>{formatPrice(book.price)}</span>
-              <span className="text-muted">Stock {book.stock}</span>
+              <span className="inline-flex items-center gap-2 text-muted">
+                Stock {book.stock}
+                {book.stock === 0 && <SoldOutBadge />}
+              </span>
               <span className="text-muted">Added {formatDate(book.created_at)}</span>
             </div>
             {actions && <div className="mt-3 flex flex-wrap gap-2 border-t border-line pt-3">{actions(book)}</div>}
@@ -56,7 +61,11 @@ export function BookList({ books, actions }: { books: AdminBookRow[]; actions?: 
                 <td className="px-4 py-3 text-muted">{book.author_name}</td>
                 <td className="px-4 py-3 text-muted">{book.category_name}</td>
                 <td className="px-4 py-3 text-right whitespace-nowrap">{formatPrice(book.price)}</td>
-                <td className="px-4 py-3 text-right">{book.stock}</td>
+                <td className="px-4 py-3 text-right whitespace-nowrap">
+                  {/* US-06: the admin sees at a glance which books customers see as Sold Out */}
+                  {book.stock === 0 ? <SoldOutBadge className="mr-2" /> : null}
+                  {book.stock}
+                </td>
                 <td className="px-4 py-3 whitespace-nowrap text-muted">{formatDate(book.created_at)}</td>
                 {actions && (
                   <td className="px-4 py-3">

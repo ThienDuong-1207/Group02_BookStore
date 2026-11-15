@@ -21,7 +21,8 @@ const book: BookDetail = {
 let stored: BookDetail | null = book;
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({}) }));
 vi.mock("@/lib/queries/book-detail", () => ({ getPublicBook: async () => stored }));
-// No promotion here; US-28 has its own tests (tests/books/detail-promo-price.test.ts).
+// No promotion here; US-28 prices are tested in dedicated specs:
+// tests/books/book-detail-promo.test.ts and tests/books/detail-promo-price.test.ts.
 vi.mock("@/lib/queries/promotions", () => ({ getPromotion: async () => null }));
 
 class NotFoundSignal extends Error {}
