@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { BookCover } from "@/components/books/BookCover";
+import { COVER_TRANSITION_NAME } from "@/components/motion/names";
 import { PriceTag } from "@/components/books/PriceTag";
 import { SoldOutBadge } from "@/components/books/SoldOutBadge";
 import { safeListHref } from "@/lib/books/list-href";
@@ -37,6 +38,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
  * AC1 active promotion → original price struck through, sale price and "-x%"; AC2 / CR-02 AC4 after the end date
  * (or before the start) → only the original price; AC3 the start and end days are both included.
  * The page is rendered on every request, so the price changes on the day the promotion ends, with no redeploy.
+ * Motion (style guide §6): the cover is the landing place of the list → detail cover animation and stays in
+ * view on tablet / desktop while the description scrolls; the text column fades in.
  */
 export default async function BookDetailPage({ params, searchParams }: Props) {
   const book = await loadBook((await params).id);
@@ -55,29 +58,33 @@ export default async function BookDetailPage({ params, searchParams }: Props) {
   const inStock = book.stock > 0;
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:py-8">
+    <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-6 pb-16 md:pt-10">
       <Link
         href={backHref}
-        className="inline-flex min-h-11 items-center gap-1 rounded-md text-sm font-medium text-brand hover:underline focus-visible:outline-2 focus-visible:outline-brand"
+        className="group inline-flex min-h-11 items-center gap-1.5 rounded-md text-sm font-medium text-brand hover:underline focus-visible:outline-2 focus-visible:outline-brand"
       >
-        <span aria-hidden="true">←</span> Back to list
+        <span aria-hidden="true" className="transition-transform duration-300 group-hover:-translate-x-1">
+          ←
+        </span>{" "}
+        Back to list
       </Link>
 
-      <article className="mt-4 grid gap-6 md:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] md:gap-10 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-        <div className="mx-auto w-full max-w-xs md:max-w-none">
-          <BookCover src={book.cover_url} title={book.title} />
+      <article className="mt-4 grid items-start gap-8 md:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] md:gap-12 lg:grid-cols-[minmax(0,21rem)_minmax(0,1fr)] lg:gap-14">
+        {/* From 768 px the cover stays in view (sticky) while a long description scrolls. */}
+        <div className="mx-auto w-full max-w-64 md:sticky md:top-24 md:max-w-none">
+          <BookCover src={book.cover_url} title={book.title} transitionName={COVER_TRANSITION_NAME} />
         </div>
 
-        <div className="flex min-w-0 flex-col gap-4">
-          <div className="flex flex-col gap-2">
+        <div className="animate-rise flex min-w-0 flex-col gap-6">
+          <div className="flex flex-col gap-3">
             <Link
               href={`/books?category=${encodeURIComponent(book.category_id)}`}
-              className="self-start rounded-full bg-brand-surface px-3 py-1 text-xs font-semibold text-brand hover:underline"
+              className="self-start rounded-full bg-brand-surface px-3 py-1 text-xs font-semibold text-brand transition-colors hover:bg-brand hover:text-brand-foreground"
             >
               {book.category_name}
             </Link>
-            <h1 className="text-2xl leading-tight font-semibold break-words md:text-3xl">{book.title}</h1>
-            <p className="text-muted">
+            <h1 className="text-3xl leading-tight font-medium break-words md:text-5xl">{book.title}</h1>
+            <p className="text-lg text-muted">
               by <span className="font-medium text-foreground">{book.author_name}</span>
             </p>
           </div>
@@ -98,11 +105,11 @@ export default async function BookDetailPage({ params, searchParams }: Props) {
             </dd>
           </dl>
 
-          <section aria-labelledby="description-heading">
-            <h2 id="description-heading" className="text-lg font-semibold">
+          <section aria-labelledby="description-heading" className="max-w-prose">
+            <h2 id="description-heading" className="text-xl font-semibold">
               Description
             </h2>
-            <p className="mt-2 leading-relaxed break-words whitespace-pre-line">{book.description}</p>
+            <p className="mt-3 leading-relaxed break-words whitespace-pre-line">{book.description}</p>
           </section>
         </div>
       </article>

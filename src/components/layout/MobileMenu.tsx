@@ -49,11 +49,14 @@ export function MobileMenu({ categories, user }: { categories: CategoryLink[]; u
       </button>
 
       {open && (
-        <div id={panelId} className="absolute inset-x-0 top-full z-30 border-b border-line bg-surface shadow-lg">
+        <div id={panelId} className="animate-pop absolute inset-x-0 top-full z-30 border-b border-line bg-surface shadow-lg">
           <div className="mx-auto flex max-h-[calc(100vh-4rem)] max-w-6xl flex-col gap-3 overflow-y-auto px-4 py-4">
             <SearchBox id="mobile-search" />
 
             <nav aria-label="Mobile" className="flex flex-col">
+              <Link href="/" onClick={close} className={navLink}>
+                Home
+              </Link>
               <Link href="/books" onClick={close} className={navLink}>
                 Books
               </Link>

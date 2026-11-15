@@ -12,14 +12,14 @@ import { safeListHref } from "@/lib/books/list-href";
  */
 export default function BookNotFound() {
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-4 px-4 py-16 text-center">
+    <main className="animate-rise mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-4 px-4 py-16 text-center">
       <svg aria-hidden="true" viewBox="0 0 24 24" className="h-12 w-12 text-muted" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round">
         <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z" />
         <path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" />
         <path d="M10 8.5l4 4m0-4l-4 4" strokeLinecap="round" />
       </svg>
       <p className="text-sm font-semibold text-brand">Book not found</p>
-      <h1 className="text-2xl font-semibold">Sorry, we couldn&apos;t find this book.</h1>
+      <h1 className="text-3xl font-medium">Sorry, we couldn&apos;t find this book.</h1>
       <p className="text-muted">It may have been removed, or the link is wrong.</p>
       {/* useSearchParams needs a Suspense boundary; until it resolves the button simply goes to page 1. */}
       <Suspense fallback={<BackToList href="/books" />}>

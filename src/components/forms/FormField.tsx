@@ -30,7 +30,7 @@ export function FormField({ label, name, type = "text", hint, error, required, .
         type={type}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
-        className={`min-h-11 rounded-md border bg-surface px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-brand ${
+        className={`min-h-11 rounded-md border bg-surface px-3 text-base outline-none transition duration-200 focus-visible:ring-2 focus-visible:ring-brand ${
           error ? "border-danger" : "border-line"
         }`}
         {...inputProps}
@@ -63,7 +63,7 @@ export function SubmitButton({ pending, children }: { pending: boolean; children
     <button
       type="submit"
       disabled={pending}
-      className="min-h-11 rounded-md bg-brand px-4 font-medium text-brand-foreground hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-60"
+      className="min-h-11 rounded-md bg-brand px-4 font-medium text-brand-foreground transition duration-200 hover:bg-brand-hover hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand active:scale-[0.98] disabled:opacity-60"
     >
       {children}
     </button>

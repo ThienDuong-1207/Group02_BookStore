@@ -248,7 +248,7 @@ where b.deleted_at is null and a.is_hidden = false and c.is_hidden = false;
 |---|---|---|---|
 | `/register` | Guest | Customer registration | US-10 |
 | `/login`, logout action | Guest / logged in | Login / logout | US-10 |
-| `/` → redirects to `/books` | All | Home = book list | US-19 |
+| `/` | All | Home page: hero + search, categories, books on sale, 8 newest books; every link leads into `/books` (approved by the PO on 11/11/2026 – before that `/` redirected to `/books`) | US-19, US-29 |
 | `/books?page=&q=&category=&minPrice=&maxPrice=` | All | Book list + search + filter + pagination (**state lives in the URL**) | US-19, 20, 01, 09, 25 |
 | `/books/[id]` | All | Book detail | US-02, US-22 |
 | `/admin` | ADMIN | Admin dashboard (links only) | US-13 |

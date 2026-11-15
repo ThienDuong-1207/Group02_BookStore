@@ -10,7 +10,7 @@ type PaginationProps = {
 };
 
 const itemClass =
-  "inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border px-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
+  "inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border px-3 text-sm font-medium transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand";
 
 /**
  * US-20 M1: Prev, page numbers, Next. B1: Prev is disabled on page 1 and Next on the last page.
@@ -20,7 +20,7 @@ export function Pagination({ page, totalPages, pathname, params }: PaginationPro
   if (totalPages <= 1) return null;
 
   return (
-    <nav aria-label="Pagination" className="mt-8 flex flex-wrap items-center justify-center gap-2">
+    <nav aria-label="Pagination" className="mt-14 flex flex-wrap items-center justify-center gap-2">
       <PageLink disabled={page <= 1} href={pageHref(pathname, params, page - 1)} label="Previous page">
         ‹ Prev
       </PageLink>
@@ -35,7 +35,7 @@ export function Pagination({ page, totalPages, pathname, params }: PaginationPro
             {item}
           </span>
         ) : (
-          <Link key={item} href={pageHref(pathname, params, item)} aria-label={`Page ${item}`} className={`${itemClass} border-line bg-surface hover:border-brand`}>
+          <Link key={item} href={pageHref(pathname, params, item)} aria-label={`Page ${item}`} className={`${itemClass} border-line bg-surface hover:-translate-y-0.5 hover:border-brand hover:text-brand`}>
             {item}
           </Link>
         ),
@@ -57,7 +57,7 @@ function PageLink({ disabled, href, label, children }: { disabled: boolean; href
     );
   }
   return (
-    <Link href={href} aria-label={label} className={`${itemClass} border-line bg-surface hover:border-brand`}>
+    <Link href={href} aria-label={label} className={`${itemClass} border-line bg-surface hover:-translate-y-0.5 hover:border-brand hover:text-brand`}>
       {children}
     </Link>
   );

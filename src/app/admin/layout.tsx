@@ -22,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <nav aria-label="Admin" className="min-w-0 lg:w-52 lg:shrink-0">
         <ul className="flex gap-1 overflow-x-auto lg:flex-col">
           <li>
-            <Link href="/admin" className="flex min-h-11 items-center rounded-md px-3 text-sm font-medium whitespace-nowrap hover:bg-surface focus-visible:outline-2 focus-visible:outline-brand">
+            <Link href="/admin" className="flex min-h-11 items-center rounded-md px-3 text-sm font-medium whitespace-nowrap transition-colors hover:bg-surface hover:text-brand focus-visible:outline-2 focus-visible:outline-brand">
               Dashboard
             </Link>
           </li>
@@ -31,7 +31,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
               {section.ready ? (
                 <Link
                   href={section.href}
-                  className="flex min-h-11 items-center rounded-md px-3 text-sm font-medium whitespace-nowrap hover:bg-surface focus-visible:outline-2 focus-visible:outline-brand"
+                  className="flex min-h-11 items-center rounded-md px-3 text-sm font-medium whitespace-nowrap transition-colors hover:bg-surface hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
                 >
                   {section.title}
                 </Link>
