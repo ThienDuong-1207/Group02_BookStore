@@ -8,7 +8,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const { next } = await searchParams;
   return (
     <>
-      <h1 className="mb-1 text-2xl font-semibold">Log in</h1>
+      <h1 className="mb-1 text-3xl font-medium">Log in</h1>
       <p className="mb-6 text-sm text-muted">Welcome back to Book Store.</p>
       <LoginForm next={next ? safeNextPath(next) : undefined} />
     </>

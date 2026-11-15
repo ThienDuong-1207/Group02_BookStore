@@ -7,8 +7,8 @@ import { secondaryButton } from "@/components/layout/styles";
  */
 export function NoResults({ q, clearSearchHref }: { q: string; clearSearchHref: string }) {
   return (
-    <div className="mt-6 flex flex-col items-center gap-3 rounded-lg border border-dashed border-line bg-surface p-8 text-center">
-      <p className="text-lg font-semibold">No results found</p>
+    <div className="animate-rise mt-8 flex flex-col items-center gap-3 rounded-xl border border-dashed border-line bg-surface px-6 py-12 text-center">
+      <p className="font-serif text-2xl font-medium">No results found</p>
       <p className="max-w-full text-sm break-words text-muted">
         {q ? <>No books match &ldquo;{q}&rdquo;.</> : "No books match the current filters."}
       </p>

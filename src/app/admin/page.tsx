@@ -11,14 +11,14 @@ export default async function AdminDashboard() {
 
   return (
     <>
-      <h1 className="text-2xl font-semibold">Admin dashboard</h1>
+      <h1 className="text-3xl font-medium">Admin dashboard</h1>
       <p className="mt-1 text-sm text-muted">Logged in as {profile?.email}</p>
 
-      <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+      <ul className="animate-rise mt-6 grid gap-4 sm:grid-cols-2">
         {ADMIN_SECTIONS.map((section) => {
           const body = (
             <>
-              <h2 className="text-lg font-semibold">{section.title}</h2>
+              <h2 className="text-xl font-semibold transition-colors group-hover:text-brand">{section.title}</h2>
               <p className="mt-1 text-sm text-muted">{section.description}</p>
               {!section.ready && <p className="mt-3 text-xs text-muted">Coming soon ({section.story})</p>}
             </>
@@ -28,7 +28,7 @@ export default async function AdminDashboard() {
               {section.ready ? (
                 <Link
                   href={section.href}
-                  className="block h-full rounded-lg border border-line bg-surface p-5 hover:border-brand focus-visible:outline-2 focus-visible:outline-brand"
+                  className="group block h-full rounded-xl border border-line bg-surface p-5 transition duration-300 hover:-translate-y-0.5 hover:border-brand hover:shadow-md focus-visible:outline-2 focus-visible:outline-brand"
                 >
                   {body}
                 </Link>

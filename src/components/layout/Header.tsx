@@ -14,6 +14,8 @@ import { navLink, primaryButton, secondaryButton } from "./styles";
  * AC2 (and US-13 M2): the Admin link is shown only to an ACTIVE administrator.
  * AC3: below 768 px everything except the logo moves into the hamburger menu.
  * US-10 M2: a logged-in user sees their name and a Logout button.
+ * Motion (style guide §6): while the page scrolls the header becomes more compact and gains a shadow
+ * (`.site-header` / `.site-header-inner` in globals.css – CSS only). The logo opens the home page `/`.
  */
 export async function Header() {
   const [profile, categories] = await Promise.all([
@@ -29,8 +31,8 @@ export async function Header() {
     : null;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur supports-[backdrop-filter]:bg-surface/85">
-      <div className="relative mx-auto flex max-w-6xl items-center gap-3 px-4 py-2">
+    <header className="site-header sticky top-0 z-30 border-b border-transparent bg-background/90 backdrop-blur">
+      <div className="site-header-inner relative mx-auto flex max-w-6xl items-center gap-3 px-4 py-3">
         <Logo />
 
         {/* Tablet and desktop */}
@@ -86,10 +88,10 @@ export async function Header() {
 function Logo() {
   return (
     <Link
-      href="/books"
-      className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-md font-serif text-xl font-bold text-brand focus-visible:outline-2 focus-visible:outline-brand"
+      href="/"
+      className="group inline-flex min-h-11 shrink-0 items-center gap-2 rounded-md font-serif text-xl font-bold text-brand focus-visible:outline-2 focus-visible:outline-brand"
     >
-      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="h-7 w-7 transition-transform duration-300 group-hover:-rotate-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round">
         <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z" />
         <path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5" />
         <path d="M9 7h7" strokeLinecap="round" />

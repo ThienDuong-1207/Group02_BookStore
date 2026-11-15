@@ -45,7 +45,7 @@ export function CategoryMenu({ categories }: { categories: CategoryLink[] }) {
       {open && (
         <ul
           id={menuId}
-          className="absolute left-0 z-20 mt-1 max-h-80 w-64 overflow-y-auto rounded-lg border border-line bg-surface p-1 shadow-lg"
+          className="animate-pop absolute left-0 z-20 mt-1 max-h-80 w-64 overflow-y-auto rounded-lg border border-line bg-surface p-1 shadow-lg"
         >
           {categories.length === 0 ? (
             <li className="px-3 py-2 text-sm text-muted">No categories yet.</li>
@@ -55,7 +55,7 @@ export function CategoryMenu({ categories }: { categories: CategoryLink[] }) {
                 <Link
                   href={categoryHref(category.id)}
                   onClick={() => setOpen(false)}
-                  className="flex min-h-11 items-center rounded-md px-3 text-sm hover:bg-brand-surface hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
+                  className="flex min-h-11 items-center rounded-md px-3 text-sm transition-colors hover:bg-brand-surface hover:text-brand focus-visible:outline-2 focus-visible:outline-brand"
                 >
                   {category.name}
                 </Link>

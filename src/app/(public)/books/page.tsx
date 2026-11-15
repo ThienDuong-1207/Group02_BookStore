@@ -18,7 +18,7 @@ export const metadata: Metadata = { title: "Books – Book Store" };
 type SearchParams = Record<string, string | string[] | undefined>;
 
 /**
- * Home page content: the "New books" grid (US-19), 12 per page, newest first (US-20).
+ * Book list (`/books`): the "New books" grid (US-19), 12 per page, newest first (US-20).
  * Cards show cover, title, author and price; the grid is 1 / 2 / 4 columns on phone / tablet / desktop.
  * US-27 (CR-02): books under an active promotion show the original price struck through, the sale price and "-x%".
  * US-01: `?q=` keeps only books whose title or author contains the keyword (case- and accent-insensitive).
@@ -58,9 +58,9 @@ export default async function BooksPage({ searchParams }: { searchParams: Promis
   const cards = withEffectivePrices(books, promotions, todayInVietnam());
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="min-w-0 text-2xl font-semibold break-words md:text-3xl">
+    <main className="mx-auto w-full max-w-6xl flex-1 px-4 pt-8 pb-16 md:pt-12">
+      <div className="animate-rise flex flex-wrap items-baseline justify-between gap-2">
+        <h1 className="min-w-0 text-3xl leading-tight font-medium break-words md:text-5xl">
           {values.q ? <>Results for &ldquo;{values.q}&rdquo;</> : categoryName ?? (filtering ? "Filtered books" : "New books")}
         </h1>
         {total > 0 && (

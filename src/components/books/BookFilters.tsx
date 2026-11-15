@@ -24,7 +24,7 @@ type BookFiltersProps = {
 };
 
 const fieldClass =
-  "min-h-11 w-full min-w-0 rounded-md border bg-surface px-3 text-base outline-none focus-visible:ring-2 focus-visible:ring-brand";
+  "min-h-11 w-full min-w-0 rounded-md border bg-surface px-3 text-base outline-none transition duration-200 focus-visible:ring-2 focus-visible:ring-brand";
 
 /**
  * Search bar (US-01) + filter panel (US-09) on the book list page. All state lives in the URL
@@ -74,7 +74,7 @@ export function BookFilters({ values, errors: serverErrors, categories }: BookFi
       aria-label="Search and filter books"
       noValidate
       onSubmit={onSubmit}
-      className="mt-4 grid min-w-0 gap-3 rounded-lg border border-line bg-surface p-4 md:grid-cols-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)] lg:items-start"
+      className="mt-6 grid min-w-0 gap-3 rounded-xl border border-line bg-surface p-4 shadow-sm md:grid-cols-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)] lg:items-start"
     >
       <div className="flex min-w-0 flex-col gap-1.5 md:col-span-3 lg:col-span-1">
         <label htmlFor="list-search" className="text-sm font-medium">

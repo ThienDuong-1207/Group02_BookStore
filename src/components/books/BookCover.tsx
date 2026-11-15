@@ -6,8 +6,11 @@ import { useEffect, useRef, useState } from "react";
  * Book cover, 2 : 3 (US-19 M1). The cover is a link to an image on the Internet (US-05 AC3), so it can be missing
  * or break later: E1 shows a placeholder when there is no link or the image fails to load.
  * A plain <img> is used on purpose: covers come from any host, and next/image would need every host listed.
+ * Look (style guide §4): `.book-cover` adds the shadow and the spine; `.shimmer` moves behind the image until it
+ * has loaded. `data-cover` marks the element that flies to the detail page (CoverTransition).
+ * `transitionName` is set on the detail page only: the place where the flying cover lands.
  */
-export function BookCover({ src, title }: { src: string | null; title: string }) {
+export function BookCover({ src, title, transitionName }: { src: string | null; title: string; transitionName?: string }) {
   const [failed, setFailed] = useState(false);
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -18,7 +21,11 @@ export function BookCover({ src, title }: { src: string | null; title: string })
   }, [src]);
 
   return (
-    <div className="relative aspect-[2/3] w-full overflow-hidden rounded-md bg-line">
+    <div
+      data-cover
+      style={transitionName ? { viewTransitionName: transitionName } : undefined}
+      className={`book-cover relative aspect-[2/3] w-full overflow-hidden bg-line ${src && !failed ? "shimmer" : ""}`}
+    >
       {src && !failed ? (
         // eslint-disable-next-line @next/next/no-img-element -- external cover links from any host (see above)
         <img

@@ -21,16 +21,27 @@ export type BookCardBook = Pick<BookListItem, "id" | "title" | "author_name" | "
  * returns to the same page with the same search / filters.
  * US-06 M2 / B1: a book with stock = 0 shows a "Sold Out" badge on its cover (style guide §4 "Badges");
  * it disappears as soon as the admin sets the stock back to 1 or more.
+ * Look and motion (style guide §4, §6): no box around the card – the cover is the object. On hover the cover
+ * lifts and tilts slightly and its shadow deepens. `data-cover-transition` lets CoverTransition fly the cover to
+ * the detail page. A discount also shows as a small tag on the cover corner (hidden from screen readers, which
+ * already hear it in the price line).
  */
 export function BookCard({ book, listHref }: { book: BookCardBook; listHref?: string }) {
   const soldOut = book.stock === 0;
+  const discount = book.pricing?.discountPercent ?? null;
   return (
     <Link
       href={detailHref(book.id, listHref)}
-      className="group flex h-full flex-col gap-3 rounded-lg border border-line bg-surface p-3 transition-shadow hover:border-brand hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+      data-cover-transition
+      className="group flex h-full flex-col gap-4 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
     >
-      <div className="relative">
+      <div className="relative transition-transform duration-500 ease-[var(--ease-book)] group-hover:-translate-y-2 group-hover:-rotate-1 group-focus-visible:-translate-y-2">
         <BookCover src={book.cover_url} title={book.title} />
+        {discount !== null && (
+          <span aria-hidden="true" className="absolute top-3 -right-1.5 rounded-l-sm rounded-tr-sm bg-accent px-2 py-0.5 text-xs font-semibold text-white shadow-md">
+            -{discount}%
+          </span>
+        )}
         {soldOut && (
           <span className="absolute top-2 left-2 rounded-full bg-danger-surface px-2 py-0.5 text-xs font-semibold text-danger shadow-sm">
             Sold Out
@@ -38,7 +49,7 @@ export function BookCard({ book, listHref }: { book: BookCardBook; listHref?: st
         )}
       </div>
       <div className="flex flex-1 flex-col gap-1">
-        <h2 title={book.title} className="line-clamp-2 font-serif text-base leading-snug font-semibold break-words group-hover:text-brand">
+        <h2 title={book.title} className="line-clamp-2 font-serif text-lg leading-snug font-semibold break-words transition-colors group-hover:text-brand">
           {book.title}
         </h2>
         <p className="truncate text-sm text-muted">{book.author_name}</p>
