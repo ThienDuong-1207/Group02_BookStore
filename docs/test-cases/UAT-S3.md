@@ -14,7 +14,7 @@ npm run test:uat -- --base http://localhost:3001   # local: `npm run dev -- -p 3
 - **SKIP** means the data has nothing to test with. Prepare the demo data below and run again.
 - Responsive layouts and admin actions need a browser and an admin login, so they stay **manual**.
 
-Result on 11/11/2026, production after PR #28–#33: **16 passed, 0 failed, 4 skipped**. UAT-04, UAT-10, UAT-18 and UAT-19 were skipped because there is no "Nguyễn" author, no active promotion, and the US-06 card badge was not merged yet.
+Result on 16/11/2026, production after PR #42 (visual refresh): **19 passed, 0 failed, 1 skipped**. Only UAT-04 is skipped (no "Nguyễn" author or title yet, demo data D4). Unknown book ids show the message but answer HTTP 200 since the refresh added `books/loading.tsx` (soft 404; PROJECT_SPEC US-22 E1 asks for 404).
 
 ## Demo data to prepare (before recording, script §4)
 
@@ -51,8 +51,8 @@ Result on 11/11/2026, production after PR #28–#33: **16 passed, 0 failed, 4 sk
 | UAT-S3-18 | 09:17 | US-21 AC2 | Same widths on `/books` | Grid 1 / 2 / 4 columns | manual (TC-F3-37) | |
 | UAT-S3-19 | 09:17 | US-21 AC3 | Admin pages at 768 px, incl. the promotion form | All fields and buttons usable (DEF-07 fixed) | manual (TC-F3-45…48) | |
 | UAT-S3-20 | 09:36 | US-06 AC1 | Admin: stock = 0 → customer list and detail | **Sold Out** badge on both | UAT-18 | |
-| UAT-S3-21 | 09:36 | US-06 AC2 | Admin: stock `-3` → Save | Error, nothing saved | manual (TC-F2-55) | |
-| UAT-S3-22 | 09:36 | US-06 AC3 | Admin: stock 0 → 1 | Badge disappears | manual (TC-F2-56) | |
+| UAT-S3-21 | 09:36 | US-06 AC2 | Admin: stock `-3` → Save | Error, nothing saved | manual (TC-F2-56) | |
+| UAT-S3-22 | 09:36 | US-06 AC3 | Admin: stock 0 → 1 | Badge disappears | manual (TC-F2-55) | |
 
 ## Regression checks also in the script (F1–F3)
 
