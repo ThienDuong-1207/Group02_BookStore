@@ -51,7 +51,7 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/books",
 }));
 
-const { default: BooksPage } = await import("@/app/(public)/books/page");
+const { default: BooksPage } = await import("@/app/(public)/books/(list)/page");
 
 type Params = Record<string, string>;
 async function render(params: Params): Promise<{ html: string } | { redirectedTo: string }> {

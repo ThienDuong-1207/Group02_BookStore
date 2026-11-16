@@ -26,7 +26,7 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/books",
 }));
 
-const { default: BooksPage } = await import("@/app/(public)/books/page");
+const { default: BooksPage } = await import("@/app/(public)/books/(list)/page");
 
 describe("US-06 AC1 – Sold Out on the customer list", () => {
   it("only the card of the book with stock 0 has the label", async () => {

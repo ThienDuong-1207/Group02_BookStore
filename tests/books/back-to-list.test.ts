@@ -43,7 +43,7 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(searchParamsFrom ? { from: searchParamsFrom } : {}),
 }));
 
-const { default: BooksPage } = await import("@/app/(public)/books/page");
+const { default: BooksPage } = await import("@/app/(public)/books/(list)/page");
 const { default: BookDetailPage } = await import("@/app/(public)/books/[id]/page");
 const { default: BookNotFound } = await import("@/app/(public)/books/[id]/not-found");
 
